@@ -1,0 +1,114 @@
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.health {
+  font-size: 0.875rem;
+}
+
+.health[data-status="ok"] {
+  color: #0a0;
+}
+
+.health[data-status="error"] {
+  color: #c00;
+}
+
+.health[data-status="checking"] {
+  color: #666;
+}
+
+.panel {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.panel h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.row input[type="text"],
+.row input[type="file"] {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.row button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+.row button:hover:not(:disabled) {
+  background: #555;
+}
+
+.row button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.result {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+}
+
+.result.success {
+  color: #0a0;
+}
+
+.result.error {
+  color: #c00;
+}
+
+.result.category {
+  color: #06c;
+  font-weight: 500;
+}
+
+.answer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.answer p {
+  margin: 0 0 0.5rem;
+}
+
+.answer .sources {
+  font-size: 0.85rem;
+  color: #666;
+}

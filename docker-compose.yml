@@ -1,0 +1,111 @@
+# Document RAG — separated services (Gateway, Ingestion, Embedding, Retrieval, RAG) + Qdrant.
+# Run LLM on host: make llm (or set LLM_URL to your llama.cpp server).
+# Frontend: make frontend (or npm run dev in frontend/).
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  embedding:
+    build:
+      context: ./backend
+      dockerfile: services/embedding/Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - EMBEDDING_BACKEND=local
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+
+  retrieval:
+    build:
+      context: ./backend
+      dockerfile: services/retrieval/Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - VECTOR_BACKEND=qdrant
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - COLLECTION_NAME=${COLLECTION_NAME:-documents}
+      - VECTOR_SIZE=384
+      - TOP_K=${TOP_K:-3}
+    depends_on:
+      - qdrant
+
+  ingestion:
+    build:
+      context: ./backend
+      dockerfile: services/ingestion/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - EMBEDDING_URL=http://embedding:8002
+      - RETRIEVAL_URL=http://retrieval:8003
+      - CHUNK_SIZE=${CHUNK_SIZE:-800}
+    depends_on:
+      - embedding
+      - retrieval
+
+  ml:
+    build:
+      context: ./backend
+      dockerfile: services/ml/Dockerfile
+    ports:
+      - "8005:8005"
+    environment:
+      - LLM_BACKEND=${LLM_BACKEND:-llama}
+      - LLM_URL=${LLM_URL:-http://host.docker.internal:8080}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - INJECTION_THRESHOLD=${INJECTION_THRESHOLD:-0.7}
+      - RETRIEVAL_SCORE_THRESHOLD=${RETRIEVAL_SCORE_THRESHOLD:-0.5}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  rag:
+    build:
+      context: ./backend
+      dockerfile: services/rag/Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - EMBEDDING_URL=http://embedding:8002
+      - RETRIEVAL_URL=http://retrieval:8003
+      - LLM_BACKEND=llama
+      - LLM_URL=${LLM_URL:-http://host.docker.internal:8080}
+      - TOP_K=${TOP_K:-3}
+      - RERANKER_PROVIDER=${RERANKER_PROVIDER:-bge}
+      - VECTOR_SEARCH_TOP_K=${VECTOR_SEARCH_TOP_K:-20}
+      - RERANK_TOP_K=${RERANK_TOP_K:-3}
+      - SAFEGUARD_PROVIDER=${SAFEGUARD_PROVIDER:-basic}
+      - SAFEGUARD_ENABLED=${SAFEGUARD_ENABLED:-true}
+      - ML_SERVICE_ENABLED=${ML_SERVICE_ENABLED:-false}
+      - ML_SERVICE_URL=http://ml:8005
+      - INJECTION_THRESHOLD=${INJECTION_THRESHOLD:-0.7}
+      - RETRIEVAL_SCORE_THRESHOLD=${RETRIEVAL_SCORE_THRESHOLD:-0.5}
+    depends_on:
+      - embedding
+      - retrieval
+      - ml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  gateway:
+    build:
+      context: ./backend
+      dockerfile: services/gateway/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - INGESTION_URL=http://ingestion:8001
+      - RAG_URL=http://rag:8004
+    depends_on:
+      - ingestion
+      - rag
+
+volumes:
+  qdrant_data:

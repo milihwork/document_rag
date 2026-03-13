@@ -1,0 +1,57 @@
+"""API path segments and JSON payload/response keys shared across services."""
+
+# API path segments (no leading base URL)
+PATH_EMBED = "/embed"
+PATH_HEALTH = "/health"
+PATH_INGEST = "/ingest"
+PATH_INGEST_TEXT = "/ingest/text"
+PATH_SEARCH = "/search"
+PATH_UPSERT = "/upsert"
+PATH_ASK = "/ask"
+PATH_ENSURE_COLLECTION = "/ensure_collection"
+PATH_COMPLETION = "/completion"
+PATH_ANALYZE = "/analyze"
+PATH_SCORE_RETRIEVAL = "/score"
+PATH_CLASSIFY = "/classify"
+
+# Request/response payload keys
+KEY_TEXT = "text"
+KEY_TEXTS = "texts"
+KEY_EMBEDDING = "embedding"
+KEY_EMBEDDINGS = "embeddings"
+KEY_CHUNKS = "chunks"
+KEY_VECTOR = "vector"
+KEY_PAYLOAD = "payload"
+KEY_POINTS = "points"
+KEY_QUERY_VECTOR = "query_vector"
+KEY_TOP_K = "top_k"
+KEY_QUESTION = "question"
+KEY_ANSWER = "answer"
+KEY_SOURCE = "source"
+KEY_SOURCES = "sources"
+KEY_ID = "id"
+
+# Status/document response keys
+KEY_STATUS = "status"
+KEY_OK = "ok"
+KEY_SUCCESS = "success"
+KEY_DOCUMENT = "document"
+KEY_CHUNKS_INSERTED = "chunks_inserted"
+KEY_COUNT = "count"
+
+# ML Service keys
+KEY_QUERY = "query"
+KEY_INJECTION = "injection"
+KEY_IS_INJECTION = "is_injection"
+KEY_CONFIDENCE = "confidence"
+KEY_REASON = "reason"
+KEY_INTENT = "intent"
+KEY_RETRIEVAL_SCORE = "retrieval_score"
+KEY_SCORE = "score"
+KEY_SUFFICIENT = "sufficient"
+KEY_CATEGORY = "category"
+KEY_CATEGORY_CONFIDENCE = "category_confidence"
+KEY_TEXT_SAMPLE = "text_sample"
+
+# Default when filename/source is missing
+SOURCE_UNKNOWN = "unknown"
