@@ -1,7 +1,6 @@
 """BGE reranker backend using cross-encoder."""
 
 import logging
-from typing import List
 
 from sentence_transformers import CrossEncoder
 
@@ -17,20 +16,20 @@ class BGEReranker(BaseReranker):
         logger.info("Loading BGE reranker model: BAAI/bge-reranker-base")
         self.model = CrossEncoder("BAAI/bge-reranker-base")
 
-    def rerank(
-        self, query: str, documents: List[str], top_k: int = 3
-    ) -> List[str]:
+    def rerank(self, query: str, documents: list[str], top_k: int = 3) -> list[str]:
         if not documents:
             return []
 
         logger.info(
-            "Reranking %d documents, returning top %d", len(documents), top_k
+            "Reranking %d documents, returning top %d",
+            len(documents),
+            top_k,
         )
         pairs = [[query, doc] for doc in documents]
         scores = self.model.predict(pairs)
 
         ranked_docs = sorted(
-            zip(documents, scores),
+            zip(documents, scores, strict=True),
             key=lambda x: x[1],
             reverse=True,
         )

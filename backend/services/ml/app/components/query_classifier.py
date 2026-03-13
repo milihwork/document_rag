@@ -11,12 +11,18 @@ logger = logging.getLogger(__name__)
 
 VALID_INTENTS = ["question", "command", "search", "clarification", "other"]
 
-CLASSIFIER_PROMPT = """You are a query intent classifier. Classify the user's query into one of these categories:
+CLASSIFIER_PROMPT = """
+You are a query intent classifier. Classify the user's query into one of these
+categories:
 
-- question: Asking for information or explanation (e.g., "What is X?", "How does Y work?")
-- command: Requesting an action (e.g., "Create a file", "Delete this", "Run the test")
-- search: Looking for specific content (e.g., "Find all files with X", "Show me Y")
-- clarification: Asking for more details about previous context (e.g., "What do you mean?", "Can you explain further?")
+- question: Asking for information or explanation (e.g., "What is X?",
+  "How does Y work?")
+- command: Requesting an action (e.g., "Create a file", "Delete this",
+  "Run the test")
+- search: Looking for specific content (e.g., "Find all files with X",
+  "Show me Y")
+- clarification: Asking for more details about previous context
+  (e.g., "What do you mean?", "Can you explain further?")
 - other: Doesn't fit the above categories
 
 User Query: {query}

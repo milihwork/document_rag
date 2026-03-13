@@ -9,7 +9,9 @@ from .base import BaseRetrievalScorer, RetrievalScoreResult
 
 logger = logging.getLogger(__name__)
 
-SCORER_PROMPT = """You are a retrieval quality evaluator. Given a user query and retrieved document chunks, assess how well the chunks answer or relate to the query.
+SCORER_PROMPT = """
+You are a retrieval quality evaluator. Given a user query and retrieved
+document chunks, assess how well the chunks answer or relate to the query.
 
 User Query: {query}
 
@@ -22,7 +24,8 @@ Evaluate:
 3. Quality: Is the information clear and useful?
 
 Respond ONLY with valid JSON (no markdown, no explanation):
-{{"score": 0.0 to 1.0, "sufficient": true or false, "reason": "brief explanation"}}
+{{"score": 0.0 to 1.0, "sufficient": true or false,
+"reason": "brief explanation"}}
 
 Score guidelines:
 - 0.0-0.3: Chunks are irrelevant or unhelpful

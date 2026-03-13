@@ -5,7 +5,14 @@ import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from shared.contracts import KEY_EMBEDDING, KEY_EMBEDDINGS, KEY_OK, KEY_STATUS, PATH_EMBED, PATH_HEALTH
+from shared.contracts import (
+    KEY_EMBEDDING,
+    KEY_EMBEDDINGS,
+    KEY_OK,
+    KEY_STATUS,
+    PATH_EMBED,
+    PATH_HEALTH,
+)
 
 from .backends import get_backend
 

@@ -7,6 +7,7 @@ import httpx
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from services.safeguard import get_safeguard
 from shared.contracts import (
     KEY_ANSWER,
     KEY_CHUNKS,
@@ -16,10 +17,9 @@ from shared.contracts import (
     KEY_IS_INJECTION,
     KEY_OK,
     KEY_QUERY,
-    KEY_QUESTION,
     KEY_QUERY_VECTOR,
+    KEY_QUESTION,
     KEY_REASON,
-    KEY_RETRIEVAL_SCORE,
     KEY_SCORE,
     KEY_SOURCE,
     KEY_SOURCES,
@@ -35,11 +35,10 @@ from shared.contracts import (
     PATH_SEARCH,
 )
 from shared.prompt_builder import build_prompt
+from shared.reranker import get_reranker
 
 from .backends import get_backend
 from .config.settings import settings
-from shared.reranker import get_reranker
-from services.safeguard import get_safeguard
 
 logging.basicConfig(
     level=logging.INFO,
@@ -124,7 +123,13 @@ async def _score_retrieval(query: str, chunks: list[dict]) -> dict:
             f"{settings.ML_SERVICE_URL}{PATH_SCORE_RETRIEVAL}",
             json={
                 KEY_QUERY: query,
-                KEY_CHUNKS: [{KEY_TEXT: c[KEY_TEXT], KEY_SOURCE: c.get(KEY_SOURCE, "unknown")} for c in chunks],
+                KEY_CHUNKS: [
+                    {
+                        KEY_TEXT: c[KEY_TEXT],
+                        KEY_SOURCE: c.get(KEY_SOURCE, "unknown"),
+                    }
+                    for c in chunks
+                ],
             },
         )
         r.raise_for_status()

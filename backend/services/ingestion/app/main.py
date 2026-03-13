@@ -149,7 +149,12 @@ async def ingest_text(request: IngestTextRequest):
 
     await _upsert(points, category=category)
 
-    logger.info("Ingested %d chunks from text (source=%s, category=%s)", len(points), source, category)
+    logger.info(
+        "Ingested %d chunks from text (source=%s, category=%s)",
+        len(points),
+        source,
+        category,
+    )
 
     return {
         KEY_STATUS: KEY_SUCCESS,
@@ -179,7 +184,11 @@ async def ingest(file: UploadFile = File(...)):
             class_result = await _classify_document(text)
             category = class_result.get(KEY_CATEGORY, "other")
             category_confidence = class_result.get(KEY_CONFIDENCE, 0.0)
-            logger.info("Document classified as: %s (confidence=%.2f)", category, category_confidence)
+            logger.info(
+                "Document classified as: %s (confidence=%.2f)",
+                category,
+                category_confidence,
+            )
 
         chunks = chunk_text(text, max_chars=settings.CHUNK_SIZE)
 
@@ -207,7 +216,12 @@ async def ingest(file: UploadFile = File(...)):
 
         await _upsert(points, category=category)
 
-        logger.info("Ingested %d chunks from %s (category=%s)", len(points), file.filename, category)
+        logger.info(
+            "Ingested %d chunks from %s (category=%s)",
+            len(points),
+            file.filename,
+            category,
+        )
 
         return {
             KEY_STATUS: KEY_SUCCESS,

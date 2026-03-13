@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-# Skip entire module if sentence_transformers not available or broken (e.g. numpy crash on some Macs)
+# Skip entire module if sentence_transformers not available or broken
 pytest.importorskip("sentence_transformers")
 
 from shared.reranker.bge_reranker import BGEReranker

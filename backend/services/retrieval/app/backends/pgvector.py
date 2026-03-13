@@ -46,30 +46,27 @@ class PgVectorBackend(VectorStore):
         with conn.cursor() as cur:
             cur.execute("CREATE EXTENSION IF NOT EXISTS vector")
             cur.execute(
-                """
-                CREATE TABLE IF NOT EXISTS {table} (
+                f"""
+                CREATE TABLE IF NOT EXISTS {settings.PGVECTOR_TABLE_NAME} (
                     id TEXT PRIMARY KEY,
                     content TEXT NOT NULL,
                     source TEXT NOT NULL DEFAULT 'unknown',
-                    embedding vector({size})
+                    embedding vector({settings.VECTOR_SIZE})
                 )
-                """.format(
-                    table=settings.PGVECTOR_TABLE_NAME,
-                    size=settings.VECTOR_SIZE,
-                ),
+                """,
             )
             # Optional: create ivfflat index for faster search after table has data.
             # For empty tables, skip or run after first upsert.
-            cur.execute(
-                "SELECT COUNT(*) FROM {table}".format(table=settings.PGVECTOR_TABLE_NAME)
-            )
+            cur.execute(f"SELECT COUNT(*) FROM {settings.PGVECTOR_TABLE_NAME}")
             if cur.fetchone()[0] > 0:
                 cur.execute(
-                    """
-                    CREATE INDEX IF NOT EXISTS {table}_embedding_idx
-                    ON {table} USING ivfflat (embedding vector_cosine_ops)
+                    f"""
+                    CREATE INDEX IF NOT EXISTS
+                    {settings.PGVECTOR_TABLE_NAME}_embedding_idx
+                    ON {settings.PGVECTOR_TABLE_NAME}
+                    USING ivfflat (embedding vector_cosine_ops)
                     WITH (lists = 100)
-                    """.format(table=settings.PGVECTOR_TABLE_NAME)
+                    """,
                 )
         logger.info("Ensured table and extension: %s", settings.PGVECTOR_TABLE_NAME)
 
@@ -82,11 +79,11 @@ class PgVectorBackend(VectorStore):
         self.ensure_collection()
         with conn.cursor() as cur:
             cur.execute(
-                """
-                SELECT content, source FROM {table}
+                f"""
+                SELECT content, source FROM {settings.PGVECTOR_TABLE_NAME}
                 ORDER BY embedding <=> %s
                 LIMIT %s
-                """.format(table=settings.PGVECTOR_TABLE_NAME),
+                """,
                 (np.array(query_vector, dtype=np.float32), k),
             )
             rows = cur.fetchall()
@@ -112,14 +109,14 @@ class PgVectorBackend(VectorStore):
                 vector = p.get(KEY_VECTOR, [])
                 vec_arr = np.array(vector, dtype=np.float32)
                 cur.execute(
-                    """
+                    f"""
                     INSERT INTO {table} (id, content, source, embedding)
                     VALUES (%s, %s, %s, %s)
                     ON CONFLICT (id) DO UPDATE SET
                         content = EXCLUDED.content,
                         source = EXCLUDED.source,
                         embedding = EXCLUDED.embedding
-                    """.format(table=table),
+                    """,
                     (pid, content, source, vec_arr),
                 )
         logger.info("Upserted %d points", len(points))

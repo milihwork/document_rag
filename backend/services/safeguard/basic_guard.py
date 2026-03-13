@@ -1,11 +1,12 @@
 """Basic safeguard: pattern- and topic-based input/output validation."""
 
-from .base import BaseSafeguard
 from shared.safeguard_constants import (
     BLOCKED_OUTPUT_PATTERNS,
     BLOCKED_PROMPT_PATTERNS,
     BLOCKED_TOPICS,
 )
+
+from .base import BaseSafeguard
 
 
 class BasicSafeguard(BaseSafeguard):

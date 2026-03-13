@@ -4,12 +4,12 @@ import os
 
 import pytest
 
+from services.safeguard import BasicSafeguard, get_safeguard
 from shared.safeguard_constants import (
     BLOCKED_OUTPUT_PATTERNS,
     BLOCKED_PROMPT_PATTERNS,
     BLOCKED_TOPICS,
 )
-from services.safeguard import BasicSafeguard, get_safeguard
 
 
 def test_constants_non_empty():

@@ -2,10 +2,10 @@
 
 import os
 from pathlib import Path
-from typing import Optional
 
 try:
     from dotenv import load_dotenv
+
     # Load .env from project root (document_rag/.env)
     _env_path = Path(__file__).resolve().parents[5] / ".env"
     load_dotenv(_env_path)
@@ -23,7 +23,7 @@ class Settings:
     # OpenAI backend
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-    OPENAI_BASE_URL: Optional[str] = os.getenv("OPENAI_BASE_URL") or None
+    OPENAI_BASE_URL: str | None = os.getenv("OPENAI_BASE_URL") or None
 
     # Injection detection thresholds
     INJECTION_THRESHOLD: float = float(os.getenv("INJECTION_THRESHOLD", "0.7"))

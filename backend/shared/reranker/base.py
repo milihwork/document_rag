@@ -1,16 +1,13 @@
 """Abstract base for reranker backends."""
 
 from abc import ABC, abstractmethod
-from typing import List
 
 
 class BaseReranker(ABC):
     """Abstract reranker: query + documents -> top_k ranked documents."""
 
     @abstractmethod
-    def rerank(
-        self, query: str, documents: List[str], top_k: int = 3
-    ) -> List[str]:
+    def rerank(self, query: str, documents: list[str], top_k: int = 3) -> list[str]:
         """
         Rerank documents based on relevance to the query.
 
