@@ -968,6 +968,10 @@ make llm
 make frontend
 ```
 
+When everything is up and running locally, it looks like this:
+
+![All services running locally](up-and-running-all.png)
+
 Then:
 
 1. Open `http://localhost:5173`
