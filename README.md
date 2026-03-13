@@ -226,6 +226,8 @@ To rebuild images after code changes: `make build` then `make up`. To stop conta
 
 Run services on your machine with **only Qdrant in Docker**. The Gateway runs in Node.js; the other backend services run in Python.
 
+**First-time setup:** Create the backend virtual environment and install dependencies (see [Local development](docs/local-development.md) → “Backend Python environment”). Without this, `make run-backends` will fail with “venv/bin/uvicorn: No such file or directory”.
+
 **Order:**
 
 ```bash

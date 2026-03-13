@@ -22,7 +22,10 @@ When everything is up and running locally, the system looks like this:
 
 This is the preferred way to run the stack locally for development: one terminal per concern, with only Qdrant in Docker.
 
-**Prerequisite:** Ensure Docker is running (`docker ps` to verify).
+**Prerequisites:**
+
+- Ensure Docker is running (`docker ps` to verify).
+- **First-time only:** Create the backend Python venv and install dependencies so `make run-backends` can find `backend/venv/bin/uvicorn`. See [Local development](local-development.md) → “Backend Python environment”.
 
 | Terminal | Command | Purpose |
 |----------|---------|---------|

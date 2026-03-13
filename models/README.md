@@ -16,6 +16,18 @@ The run script expects:
 1. **Recommended:** Download from [Hugging Face — TheBloke/Mistral-7B-Instruct-v0.2-GGUF](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF): get the **Q4_K_M** GGUF file and place it in this folder as `mistral-7b-instruct-v0.2.Q4_K_M.gguf`.
 2. **Alternative:** Use any other GGUF model and set `MODEL_PATH=./models/your-model.gguf` when you run `make llm`.
 
+### Download manually with curl
+
+From the project root, or from this `models/` folder:
+
+```bash
+cd models
+curl -L -o mistral-7b-instruct-v0.2.Q4_K_M.gguf \
+  "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+```
+
+The file is several GB; the download may take a while.
+
 ## Setup order
 
 1. Run `make init-llama` (clones and builds llama.cpp).
