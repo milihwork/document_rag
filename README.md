@@ -1,5 +1,7 @@
 # Document RAG AI
 
+![Document RAG cover](docs/readme_cover.png)
+
 A **local-first Retrieval-Augmented Generation (RAG) platform** for document question answering.
 
 Upload PDF documents, ask questions, and receive answers grounded in your documents, all running **locally with no external API keys required** by default.
