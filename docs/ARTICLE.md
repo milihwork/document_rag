@@ -6,7 +6,7 @@
 
 *You’ve probably seen buzzwords like RAG, vector database, embeddings, MCP, and local LLMs everywhere. This article is meant to make those terms feel concrete by showing how they fit together in a real project.*
 
-![RAG cover](docs/readme_cover.png)
+![RAG cover](readme_cover.png)
 
 ## What You’ll See in This Project
 
@@ -43,12 +43,6 @@
 * [19. Refactoring Path: LangChain, LlamaIndex, or Bedrock](#19-refactoring-path-langchain-llamaindex-or-bedrock)
 * [20. Conclusion](#20-conclusion)
 * [Demoing This Repo](#demoing-this-repo)
-
-### Architecture first
-
-![Architecture diagram](architecture.png)
-
-*[↑ Full section: 6. High-Level Architecture](#6-high-level-architecture)*
 
 Most AI tutorials still follow the same recipe: call OpenAI, print the response, and label it an AI application.
 
