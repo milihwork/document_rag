@@ -261,7 +261,7 @@ Here is the concrete stack used in this project.
 | Vector database               | `(Vector DB) --> Qdrant`                                              |
 | API gateway                   | `(NodeJS) --> Express + TypeScript`                                   |
 | Backend services              | `(Python) --> FastAPI`                                                |
-| Frontend                      | `(NodeJS) --> React + Vite + TypeScript`                              |
+| Frontend                      | `Frontend (React) --> React + Vite + TypeScript`                              |
 | Optional agent interface      | `(Python) --> MCP server via FastMCP`                                 |
 | Optional alternative backends | `(Config-driven) --> OpenAI, pgvector, Bedrock placeholders/backends` |
 
