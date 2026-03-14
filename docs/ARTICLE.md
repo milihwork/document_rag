@@ -169,7 +169,7 @@ That grounding is what makes RAG more useful for document-based assistants than 
 
 ## 6. High-Level Architecture
 
-![Architecture diagram](docs/architecture.png)
+![Architecture diagram](architecture.png)
 
 At a high level, the system is split into focused services instead of a single large app:
 
