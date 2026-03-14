@@ -6,6 +6,8 @@
 
 *You’ve probably seen buzzwords like RAG, vector database, embeddings, MCP, and local LLMs everywhere. This article is meant to make those terms feel concrete by showing how they fit together in a real project.*
 
+![RAG cover](docs/readme_cover.png)
+
 ## What You’ll See in This Project
 
 - **Local-first RAG architecture**
@@ -17,6 +19,36 @@
 - **React frontend** for document upload and chat
 - **Optional ML layer** for security and query analysis
 - **MCP integration** so AI agents can use the system as tools
+
+## Table of contents
+
+* [1. Introduction](#1-introduction)
+* [2. What Is a Local AI Stack](#2-what-is-a-local-ai-stack)
+* [3. Why Build AI Without OpenAI](#3-why-build-ai-without-openai)
+* [4. Use Cases for Local AI](#4-use-cases-for-local-ai)
+* [5. Key Concepts Behind the System](#5-key-concepts-behind-the-system)
+* [6. High-Level Architecture](#6-high-level-architecture)
+* [7. Technology Stack](#7-technology-stack)
+* [8. System Components Explained](#8-system-components-explained)
+* [9. Document Ingestion Pipeline](#9-document-ingestion-pipeline)
+* [10. Example Document Ingestion Lifecycle](#10-example-document-ingestion-lifecycle)
+* [11. Query Processing Flow](#11-query-processing-flow)
+* [12. Example Request Lifecycle](#12-example-request-lifecycle)
+* [13. Improving Retrieval Quality](#13-improving-retrieval-quality)
+* [14. Security Considerations](#14-security-considerations)
+* [15. Performance Optimization](#15-performance-optimization)
+* [16. Advantages / Pros of a Local AI Stack](#16-advantages--pros-of-a-local-ai-stack)
+* [17. Limitations / Cons and Tradeoffs](#17-limitations--cons-and-tradeoffs)
+* [18. Future Improvements](#18-future-improvements)
+* [19. Refactoring Path: LangChain, LlamaIndex, or Bedrock](#19-refactoring-path-langchain-llamaindex-or-bedrock)
+* [20. Conclusion](#20-conclusion)
+* [Demoing This Repo](#demoing-this-repo)
+
+### Architecture first
+
+![Architecture diagram](architecture.png)
+
+*[↑ Full section: 6. High-Level Architecture](#6-high-level-architecture)*
 
 Most AI tutorials still follow the same recipe: call OpenAI, print the response, and label it an AI application.
 
@@ -142,6 +174,8 @@ In practice, RAG combines retrieval and generation:
 That grounding is what makes RAG more useful for document-based assistants than raw prompting alone.
 
 ## 6. High-Level Architecture
+
+![Architecture diagram](docs/architecture.png)
 
 At a high level, the system is split into focused services instead of a single large app:
 

@@ -8,6 +8,31 @@ Upload PDF documents, ask questions, and receive answers grounded in your docume
 
 This project is designed as a small AI platform rather than a single demo script: it includes ingestion, chunking, embeddings, vector search, reranking, query rewriting, answer generation, source attribution, and optional LLM-based analysis. The system is built with a **service-oriented architecture** and **pluggable AI backends** so core components can be swapped without changing the public APIs.
 
+## Table of contents
+
+* [Why This Project Stands Out](#why-this-project-stands-out)
+* [Demo Guide](#demo-guide)
+* [Features](#features)
+* [Local AI Stack](#local-ai-stack)
+* [Implemented vs Planned](#implemented-vs-planned)
+* [Architecture](#architecture)
+* [Prerequisites](#prerequisites)
+* [Quick Start](#quick-start)
+* [Local Development](#local-development)
+* [API Endpoints](#api-endpoints)
+* [Configuration](#configuration)
+* [Development](#development)
+* [Project Policies](#project-policies)
+* [Troubleshooting](#troubleshooting)
+* [Project Structure](#project-structure)
+* [Security and Safeguards](#security-and-safeguards)
+* [Roadmap and Future Improvements](#roadmap-and-future-improvements)
+* [License](#license)
+
+![Architecture diagram](docs/architecture.png)
+
+*[↑ Full Architecture section](#architecture)*
+
 ## Why This Project Stands Out
 
 * Runs fully local by default with `sentence-transformers`, Qdrant, and `llama.cpp`
@@ -28,8 +53,6 @@ For the full documentation map, see [docs/README.md](docs/README.md).
 ---
 
 # Features
-
-## Polished Feature List
 
 ### Core RAG workflow
 
