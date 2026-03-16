@@ -3,4 +3,5 @@ uvicorn[standard]
 sentence-transformers>=3.0,<4.0
 numpy>=1.24,<2
 pydantic
+pypdf
 python-dotenv

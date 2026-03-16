@@ -8,9 +8,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY shared/ shared/
 COPY services/rag/ services/rag/
 COPY services/safeguard/ services/safeguard/
-COPY services/reranker/ services/reranker/
+# Reranker lives in shared/reranker/ (already copied above). No services/reranker/.
 # Ensure "services" is a proper package so "services.rag.app.main" resolves (same as local PYTHONPATH=backend)
-RUN touch /app/services/__init__.py
+RUN mkdir -p /app/services && touch /app/services/__init__.py
 
 ENV PYTHONPATH=/app
 EXPOSE 8004

@@ -2,7 +2,9 @@ fastapi
 uvicorn[standard]
 qdrant-client
 pydantic
+pypdf
 python-dotenv
 psycopg2-binary
 pgvector
 numpy
+sentence-transformers>=3.0,<4.0

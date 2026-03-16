@@ -5,3 +5,4 @@ pypdf
 python-dotenv
 python-multipart
 pydantic
+sentence-transformers>=3.0,<4.0
