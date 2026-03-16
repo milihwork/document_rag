@@ -1,5 +1,7 @@
 """Unit tests for RAG tool implementations (mocked HTTP)."""
 
+import asyncio
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -10,10 +12,7 @@ from mcp_service.rag_tools import (
 )
 
 
-@pytest.mark.asyncio
-async def test_search_documents_impl_calls_embed_then_search(
-    mock_embedding, mock_chunks
-):
+def test_search_documents_impl_calls_embed_then_search(mock_embedding, mock_chunks):
     """search_documents_impl should call embed then search with correct payloads."""
     resp1 = MagicMock()
     resp1.raise_for_status = MagicMock()
@@ -27,7 +26,7 @@ async def test_search_documents_impl_calls_embed_then_search(
         client_cls.return_value.__aenter__.return_value.post = mock_post
         client_cls.return_value.__aexit__.return_value = None
 
-        result = await search_documents_impl("test query")
+        result = asyncio.run(search_documents_impl("test query"))
 
     assert result == mock_chunks
     assert mock_post.call_count == 2
@@ -40,8 +39,7 @@ async def test_search_documents_impl_calls_embed_then_search(
     assert "top_k" in second_call[1]["json"]
 
 
-@pytest.mark.asyncio
-async def test_ask_rag_impl_calls_rag_service(mock_rag_response):
+def test_ask_rag_impl_calls_rag_service(mock_rag_response):
     """ask_rag_impl should POST to RAG /ask and return parsed response."""
     mock_resp = MagicMock()
     mock_resp.raise_for_status = MagicMock()
@@ -52,7 +50,7 @@ async def test_ask_rag_impl_calls_rag_service(mock_rag_response):
         client_cls.return_value.__aenter__.return_value.post = mock_post
         client_cls.return_value.__aexit__.return_value = None
 
-        result = await ask_rag_impl("What is RAG?")
+        result = asyncio.run(ask_rag_impl("What is RAG?"))
 
     assert result == mock_rag_response
     assert result["answer"] == "RAG is Retrieval Augmented Generation."
@@ -63,8 +61,7 @@ async def test_ask_rag_impl_calls_rag_service(mock_rag_response):
     assert mock_post.call_args[1]["json"] == {"question": "What is RAG?"}
 
 
-@pytest.mark.asyncio
-async def test_ingest_document_impl_calls_ingestion(mock_ingest_response):
+def test_ingest_document_impl_calls_ingestion(mock_ingest_response):
     """ingest_document_impl should POST to /ingest/text with text and source."""
     mock_resp = MagicMock()
     mock_resp.raise_for_status = MagicMock()
@@ -75,7 +72,9 @@ async def test_ingest_document_impl_calls_ingestion(mock_ingest_response):
         client_cls.return_value.__aenter__.return_value.post = mock_post
         client_cls.return_value.__aexit__.return_value = None
 
-        result = await ingest_document_impl("Some document text.", source="my-doc")
+        result = asyncio.run(
+            ingest_document_impl("Some document text.", source="my-doc")
+        )
 
     assert result == mock_ingest_response
     assert result["chunks_inserted"] == 2
@@ -88,8 +87,7 @@ async def test_ingest_document_impl_calls_ingestion(mock_ingest_response):
     }
 
 
-@pytest.mark.asyncio
-async def test_ingest_document_impl_default_source(mock_ingest_response):
+def test_ingest_document_impl_default_source(mock_ingest_response):
     """ingest_document_impl should use 'mcp' as default source."""
     mock_resp = MagicMock()
     mock_resp.raise_for_status = MagicMock()
@@ -100,6 +98,6 @@ async def test_ingest_document_impl_default_source(mock_ingest_response):
         client_cls.return_value.__aenter__.return_value.post = mock_post
         client_cls.return_value.__aexit__.return_value = None
 
-        await ingest_document_impl("Text only.")
+        asyncio.run(ingest_document_impl("Text only."))
 
     assert mock_post.call_args[1]["json"]["source"] == "mcp"

@@ -92,7 +92,7 @@ run-mcp:
 	PYTHONPATH=. ./backend/venv/bin/python -m mcp_service.main
 
 test-mcp:
-	PYTHONPATH=. ./backend/venv/bin/python -m pytest mcp_service/tests/ -v
+	./backend/venv/bin/pip install -q pytest-asyncio && PYTHONPATH=. ./backend/venv/bin/python -m pytest mcp_service/tests/ -v
 
 test: test-backend test-gateway test-mcp
 
