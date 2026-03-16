@@ -5,6 +5,7 @@ import time
 
 import httpx
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from services.safeguard import get_safeguard
@@ -138,6 +139,12 @@ async def _score_retrieval(query: str, chunks: list[dict]) -> dict:
 
 class AskRequest(BaseModel):
     question: str
+
+
+@app.get("/")
+def root():
+    """Redirect root to API docs."""
+    return RedirectResponse(url="/docs", status_code=302)
 
 
 @app.post(PATH_ASK)

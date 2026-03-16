@@ -7,6 +7,7 @@ import uuid
 
 import httpx
 from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 # Use shared package (run with PYTHONPATH including backend root)
@@ -106,6 +107,12 @@ class IngestTextRequest(BaseModel):
 
     text: str
     source: str = "mcp"
+
+
+@app.get("/")
+def root():
+    """Redirect root to API docs."""
+    return RedirectResponse(url="/docs", status_code=302)
 
 
 @app.post(PATH_INGEST_TEXT)

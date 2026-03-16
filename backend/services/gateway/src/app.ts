@@ -26,6 +26,10 @@ app.use(
 );
 app.use(express.json());
 
+app.get('/', (_req: Request, res: Response) => {
+  res.redirect(302, '/openapi/docs');
+});
+
 app.get('/openapi.json', (_req: Request, res: Response) => res.json(openApiSpec));
 app.get('/docs/spec', (_req: Request, res: Response) => res.json(openApiSpec));
 app.use('/openapi/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));

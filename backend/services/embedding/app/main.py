@@ -3,6 +3,7 @@
 import logging
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from shared.contracts import (
@@ -39,6 +40,12 @@ class EmbedRequest(BaseModel):
 
     text: str | None = None
     texts: list[str] | None = None
+
+
+@app.get("/")
+def root():
+    """Redirect root to API docs."""
+    return RedirectResponse(url="/docs", status_code=302)
 
 
 @app.post(PATH_EMBED)

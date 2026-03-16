@@ -4,6 +4,7 @@ import logging
 import time
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from shared.contracts import KEY_OK, KEY_STATUS, PATH_HEALTH
@@ -76,6 +77,12 @@ class ClassifyRequest(BaseModel):
 class ClassifyResponse(BaseModel):
     category: str
     confidence: float
+
+
+@app.get("/")
+def root():
+    """Redirect root to API docs."""
+    return RedirectResponse(url="/docs", status_code=302)
 
 
 @app.post(PATH_ANALYZE)
