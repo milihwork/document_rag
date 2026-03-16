@@ -50,7 +50,7 @@ That is fine for a quick prototype, but it becomes limiting fast. You inherit AP
 
 I wanted to build something closer to a real product: a local-first AI system that can ingest documents, search them semantically, generate grounded answers, and stay flexible enough to support both humans and AI agents.
 
-That is what `document_rag` is. It is a local-first Retrieval-Augmented Generation (RAG) platform for uploading documents, retrieving relevant context, and answering questions with sources. By default, it runs locally without requiring OpenAI, and it is structured as a multi-service monorepo with an MCP server so the same platform can also be used by tools like Cursor or Claude Desktop.
+That is what `document_rag` is. It is a local-first Retrieval-Augmented Generation (RAG) platform for uploading documents, retrieving relevant context, and answering questions with sources. By default, it runs locally without requiring OpenAI, and it is structured as a multi-service monorepo with an MCP server so the same platform can also be used by tools like Cursor or Claude Desktop. You can find the full source code on GitHub at `https://github.com/milihwork/document_rag`.
 
 In this article, I will walk through the architecture, the tech stack, the tradeoffs, and why building AI locally is worth considering in the first place.
 
