@@ -4,6 +4,7 @@ venv/
 __pycache__/
 frontend/dist/
 backend/services/gateway/dist/
+backend/services/gateway/dist-test/
 node_modules/
 .env
 **/.env
