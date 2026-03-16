@@ -88,7 +88,7 @@ app.post(
         { question },
         {
           headers: { 'Content-Type': 'application/json' },
-          timeout: 90_000,
+          timeout: 180_000,
         },
       );
 
