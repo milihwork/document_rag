@@ -1,14 +1,13 @@
-![Article Cover](article_cover.png)
 
-# How I Built a Local-First AI Stack for Document Q&A Without OpenAI
+![Article Cover Image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/obbvzdfqt8aawvwuvy3t.png)
+
+## How I Built a Local-First AI Stack for Document Q&A Without OpenAI 📚🤖
 
 *A multi-service monorepo with `llama.cpp`, Qdrant, Python `FastAPI` services, React, Node and MCP support for AI agents.*
 
 *You’ve probably seen buzzwords like RAG, vector database, embeddings, MCP, and local LLMs everywhere. This article is meant to make those terms feel concrete by showing how they fit together in a real project.*
 
-![RAG cover](readme_cover.png)
-
-## What You’ll See in This Project
+## What You’ll See in This Project 👀
 
 - **Local-first RAG architecture**
 - **Document PDF ingestion and chunking pipeline**
@@ -20,7 +19,7 @@
 - **Optional ML layer** for security and query analysis
 - **MCP integration** so AI agents can use the system as tools
 
-## Table of contents
+## Table of contents 🧭
 
 * [1. Introduction](#1-introduction)
 * [2. What Is a Local AI Stack](#2-what-is-a-local-ai-stack)
@@ -46,15 +45,17 @@
 
 Most AI tutorials still follow the same recipe: call OpenAI, print the response, and label it an AI application.
 
-That is fine for a quick prototype, but it becomes limiting fast. You inherit API costs, external latency, privacy concerns, and a system design that often depends on one provider sitting in the middle of everything.
+That is fine for a quick prototype, but it becomes limiting fast. You inherit API costs, external latency, privacy concerns, and a system design that often relies on a single provider sitting in the middle of everything.
 
 I wanted to build something closer to a real product: a local-first AI system that can ingest documents, search them semantically, generate grounded answers, and stay flexible enough to support both humans and AI agents.
 
-That is what `document_rag` is. It is a local-first Retrieval-Augmented Generation (RAG) platform for uploading documents, retrieving relevant context, and answering questions with sources. By default, it runs locally without requiring OpenAI, and it is structured as a multi-service monorepo with an MCP server so the same platform can also be used by tools like Cursor or Claude Desktop. You can find the full source code on GitHub at `https://github.com/milihwork/document_rag`.
+That is what `document_rag` is. It is a local-first Retrieval-Augmented Generation (RAG) platform for uploading documents, retrieving relevant context, and answering questions with sources. By default, it runs locally without requiring OpenAI, and it is structured as a multi-service monorepo with an MCP server so tools like Cursor or Claude Desktop can also use the same platform.
+
+You can find the full source code on GitHub at `https://github.com/milihwork/document_rag`.
 
 In this article, I will walk through the architecture, the tech stack, the tradeoffs, and why building AI locally is worth considering in the first place.
 
-## 1. Introduction
+## 1. Introduction 🌱
 
 AI-powered applications are quickly moving from novelty to default product features. Search, support assistants, internal copilots, documentation chat, and workflow automation are all being rebuilt around language models.
 
@@ -69,7 +70,7 @@ Running AI locally is one answer to those concerns.
 
 In this project, I built a local-first RAG system that ingests PDFs and text, chunks them, turns them into embeddings, stores them in a vector database, retrieves relevant context for a question, and then generates an answer with a local LLM. It lives in a monorepo that contains the frontend, backend services, shared modules, and an MCP server for agent access. The article shows how that stack fits together and why this architecture is useful beyond a demo.
 
-## 2. What Is a Local AI Stack
+## 2. What Is a Local AI Stack 🧱
 
 A local AI stack is a system where the critical AI components run on infrastructure you control instead of depending entirely on an external API provider.
 
@@ -98,13 +99,13 @@ In `document_rag`, the default local stack is:
 
 From a repository-design perspective, this is also a monorepo: multiple related applications and services live in one Git repository, share documentation and infrastructure, and work together as one system.
 
-## 3. Why Build AI Without OpenAI
+## 3. Why Build AI Without OpenAI 💸
 
 There is nothing wrong with OpenAI or other cloud providers. They are excellent tools. But there are solid engineering reasons to build a system that does not require them by default.
 
 ### Cost considerations
 
-Hosted APIs are easy to start with, but repeated embedding calls, chat completions, and large context windows can become expensive. A local stack makes cost more predictable because the main expense is infrastructure and hardware, not token billing on every request.
+Hosted APIs are easy to start with, but repeated embedding calls, chat completions, and large context windows can become expensive. A local stack makes costs more predictable because the main expense is infrastructure and hardware, not token billing on every request.
 
 For example, AWS Bedrock pricing depends on the model you choose and can add up quickly at scale. As one reference point, the AWS Bedrock pricing page lists Claude 3.5 Sonnet Extended Access at roughly `$6` per million input tokens and `$30` per million output tokens, with batch pricing lower than that. That may be perfectly reasonable for production workloads, but the cost becomes usage-driven very quickly once you have frequent queries, longer contexts, or multiple users.
 
@@ -126,7 +127,7 @@ If the whole product depends on one hosted provider, switching later can be pain
 
 Some tools need to run on internal networks, development laptops, or restricted environments. A local-first design makes those scenarios practical.
 
-## 4. Use Cases for Local AI
+## 4. Use Cases for Local AI 🎯
 
 A local AI stack is especially useful for:
 
@@ -138,13 +139,13 @@ A local AI stack is especially useful for:
 
 This repository focuses on document question answering, but the same architecture can support internal wikis, policy assistants, onboarding tools, legal document review support, and research archives.
 
-## 5. Key Concepts Behind the System
+## 5. Key Concepts Behind the System 🧠
 
 Before looking at the architecture, it helps to define the core RAG building blocks.
 
 ### Large Language Models
 
-LLM stands for **Large Language Model**. It is the component responsible for generating the final answer from the user question plus retrieved context. In this project, the default runtime is `llama.cpp`, which serves a local model such as Mistral 7B in GGUF format.
+LLM stands for **Large Language Model**. It is the component responsible for generating the final answer from the user question plus the retrieved context. In this project, the default runtime is `llama.cpp`, which serves a local model such as Mistral 7B in GGUF format.
 
 ### Embeddings
 
@@ -156,7 +157,7 @@ Vector search lets the system retrieve the most relevant document chunks for a u
 
 ### Retrieval-Augmented Generation
 
-RAG stands for **Retrieval-Augmented Generation**. It combines document retrieval with language generation so the model answers using relevant source material instead of relying only on its pretrained knowledge.
+RAG stands for **Retrieval-Augmented Generation**. It combines document retrieval with language generation, so the model answers using relevant source material instead of relying only on its pretrained knowledge.
 
 In practice, RAG combines retrieval and generation:
 
@@ -167,9 +168,10 @@ In practice, RAG combines retrieval and generation:
 
 That grounding is what makes RAG more useful for document-based assistants than raw prompting alone.
 
-## 6. High-Level Architecture
+## 6. High-Level Architecture 🏗️
 
-![Architecture diagram](architecture.png)
+
+![High-Level Architecture Image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ozq2r6jn92r55en7y72e.png)
 
 At a high level, the system is split into focused services instead of a single large app:
 
@@ -182,7 +184,7 @@ At a high level, the system is split into focused services instead of a single l
 - Optional ML service for injection detection, query classification, and retrieval scoring
 - MCP server so AI agents can use the same backend as tools
 
-This layout is one reason I describe the project as a monorepo. Instead of separating everything into different repositories, the frontend, backend services, shared modules, and MCP integration are versioned together. For a system like this, that makes local development, documentation, and architecture changes easier to manage.
+This layout is one reason I describe the project as a monorepo. Instead of separating everything into different repositories, the frontend, backend services, shared modules, and MCP integration are versioned together. For a system like this, it makes local development, documentation, and architecture changes easier to manage.
 
 The main data flow looks like this:
 
@@ -195,60 +197,14 @@ The main data flow looks like this:
 
 Here is the high-level architecture:
 
-```mermaid
-flowchart TB
-    subgraph clients[Clients]
-        UI["(Frontend) - React UI"]
-        Agent["(Agent) - MCP Client"]
-    end
-
-    subgraph access[Access Layer]
-        GW["(Node) - Gateway API Entry"]
-        MCP["(MCP Server) - Agent Tools"]
-    end
-
-    subgraph services[Backend Services]
-        ING["(Ingestion Service) - Parse Chunk Index"]
-        EMB["(Embedding Service) - Text to Vectors"]
-        RET["(Retrieval Service) - Search and Store"]
-        RAG["(RAG Service) - Retrieve and Generate"]
-        ML["(ML Service) - Analyze and Score"]
-    end
-
-    subgraph infra[AI Infrastructure]
-        QD["(Vector DB) - Qdrant"]
-        LLM["(Model Runtime) - llama.cpp"]
-    end
-
-    UI --> GW
-    Agent --> MCP
-
-    GW --> ING
-    GW --> RAG
-
-    MCP --> ING
-    MCP --> RET
-    MCP --> RAG
-
-    ING --> EMB
-    ING --> RET
-
-    RAG --> EMB
-    RAG --> RET
-    RAG --> ML
-    RAG --> LLM
-
-    RET --> QD
-    ML --> LLM
-```
-
-
+![High Level diagram](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vbikd1689ffdrw97a49t.png)
+  
 
 There is also a second access path besides the browser UI: the MCP server exposes the system to AI agents over the Model Context Protocol. That means the same platform can power both a human-facing frontend and agent workflows such as `search_documents`, `ask_rag`, and `ingest_document`.
 
 That separation makes the system easier to reason about, replace, and extend.
 
-## 7. Technology Stack
+## 7. Technology Stack 🧰
 
 Here is the concrete stack used in this project.
 
@@ -268,7 +224,7 @@ Here is the concrete stack used in this project.
 
 One thing I like about this setup is that it stays practical. The default stack is local-first, but the interfaces are designed so that changing a backend does not force a full rewrite of the product.
 
-## 8. System Components Explained
+## 8. System Components Explained 🧩
 
 ### Gateway / API layer
 
@@ -304,37 +260,10 @@ The MCP server is a thin integration layer that exposes the platform as tools fo
 
 The service architecture looks like this:
 
-```mermaid
-flowchart LR
-    FE["(Frontend) - Upload and Chat"] --> GW["(Gateway) - API Entry"]
-    GW --> ING["(Ingestion Service) - Parse Chunk Index"]
-    GW --> RAG["(RAG Service) - Retrieve and Generate"]
-
-    MCP["(MCP Server) - Agent Tools"] --> ING
-    MCP --> RET["(Retrieval Service) - Search and Store"]
-    MCP --> RAG
-
-    ING --> Shared["(Shared Module) - Chunking and Parsing"]
-    ING --> EMB["(Embedding Service) - Text to Vectors"]
-    ING --> RET
-    ING -.-> MLDOC["(ML Service) - Document Classification (Optional)"]
-
-    RAG --> EMB
-    RAG --> RET
-    RAG --> MLSVC["(ML Service) - Analyze and Score (Optional)"]
-    RAG --> LLM["(LLM Abstraction) - Generate Answers"]
-    RAG -.-> Rewriter["(RAG Internal Module) - Query Rewriter"]
-    RAG -.-> Reranker["(RAG Internal Module) - Reranker"]
-    RAG -.-> Safe["(RAG Internal Module) - Safeguards"]
-
-    RET --> VDB["(Vector DB) - Qdrant or pgvector"]
-    EMB --> EBackend["(Embedding Backend) - Local or Cloud"]
-    LLM --> LBackend["(Model Runtime) - llama.cpp or Other Provider"]
-```
+![Service architecture diagram](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/911a31ibccuopmxg7jqo.png)
 
 
-
-## 9. Document Ingestion Pipeline
+## 9. Document Ingestion Pipeline 📥
 
 Ingestion is where a lot of real RAG quality is decided.
 
@@ -348,18 +277,32 @@ The pipeline in this repo looks like this:
 
 Here is the ingestion pipeline:
 
-```mermaid
-flowchart LR
-    U["(Input) - Upload or MCP Text"] --> GW["(Gateway or MCP) - Accept Request"]
-    GW --> ING["(Ingestion Service) - Parse Chunk Index"]
-    ING --> Parse["(Parser) - Extract PDF or Text"]
-    Parse --> Chunk["(Chunker) - Split Document"]
-    Chunk --> Embed["(Embedding Service) - Generate Vectors"]
-    Embed --> Vec["(Vectors) - Chunk Embeddings"]
-    Vec --> Ret["(Retrieval Service) - Upsert Points"]
-    Ret --> QD["(Vector DB) - Store in Qdrant"]
-```
+**Input**
+A document or text is provided by the user through upload or via the MCP client.
 
+**Gateway / MCP Server**
+The request is received and validated by the Gateway API or the MCP server, which acts as the system entry point.
+
+**Ingestion Service**
+The request is forwarded to the Ingestion Service, responsible for preparing the document for processing and indexing.
+
+**Parser**
+The parser extracts raw text from the uploaded content (for example PDF, TXT, or other supported formats).
+
+**Chunker**
+The extracted text is split into smaller chunks to optimise embedding generation and retrieval accuracy.
+
+**Embedding Service**
+Each chunk is converted into a vector representation (embedding) using an embedding model.
+
+**Vector Preparation**
+The generated vectors represent the semantic meaning of each chunk.
+
+**Retrieval Service**
+The vectors and their associated metadata are upserted through the retrieval service.
+
+**Vector Database**
+The vectors are stored in Qdrant, where they become searchable for future semantic queries.
 
 
 ### Document parsing
@@ -378,7 +321,7 @@ Each chunk is sent to the Embedding service, which returns vector representation
 
 The Retrieval service upserts the vectors into Qdrant, making the document searchable for future queries.
 
-## 10. Example Document Ingestion Lifecycle
+## 10. Example Document Ingestion Lifecycle 🔄
 
 To make the ingestion path as concrete as the query path, here is a simplified lifecycle of what happens when a user uploads a PDF document through the frontend.
 
@@ -505,47 +448,18 @@ The Gateway passes that response back to the frontend, which can then confirm th
 
 Here is the same ingestion flow shown as a sequence trace:
 
-```mermaid
-sequenceDiagram
-    participant user as User
-    participant frontend as ReactFrontend
-    participant gateway as Gateway_8000
-    participant ingestion as IngestionService_8001
-    participant ml as MLService_8005
-    participant embedding as EmbeddingService_8002
-    participant retrieval as RetrievalService_8003
-    participant qdrant as Qdrant_6333
-
-    user->>frontend: Upload PDF document
-    frontend->>gateway: POST /ingest/
-    gateway->>ingestion: POST /ingest
-    ingestion->>ingestion: extract text from PDF
-    ingestion->>ml: POST /classify (optional)
-    ml-->>ingestion: category and confidence
-    ingestion->>ingestion: chunk document
-    ingestion->>embedding: POST /embed with texts[]
-    embedding-->>ingestion: embeddings[]
-    ingestion->>retrieval: POST /upsert
-    retrieval->>qdrant: store vectors and metadata
-    qdrant-->>retrieval: upsert complete
-    retrieval-->>ingestion: success
-    ingestion-->>gateway: status, chunks_inserted, document
-    gateway-->>frontend: JSON response
-    frontend-->>user: Document ready for search
-```
-
-
+![Ingestion flow sequence trace Image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/4y1ln1w2k921xt43nriv.png)
 
 This flow is useful because it shows that ingestion is not just file upload. It is a full indexing pipeline: parsing, chunking, embedding, and vector storage. That is what makes later RAG queries possible.
 
-## 11. Query Processing Flow
+## 11. Query Processing Flow 🔍
 
 Question answering follows a similar service-oriented path:
 
 1. The user asks a question in the frontend.
 2. The Gateway forwards the question to the RAG service.
 3. The RAG service validates the input with safeguards.
-4. If enabled, the ML service analyzes the query for prompt injection and intent classification.
+4. If enabled, the ML service analyses the query for prompt injection and intent classification.
 5. If enabled, the query can be rewritten into a clearer search form.
 6. The query is embedded.
 7. The Retrieval service performs vector search in Qdrant.
@@ -558,30 +472,57 @@ Question answering follows a similar service-oriented path:
 
 The RAG query flow looks like this:
 
-```mermaid
-flowchart LR
-    Q["(User Input) - Ask Question"] --> GW["(Gateway) - Receive Request"]
-    GW --> RAG["(RAG Service) - Orchestrate Flow"]
-    RAG --> InSafe["(Safeguards) - Validate Input"]
-    InSafe --> MLAnalyze["(ML Service) - Analyze Query (Optional)"]
-    MLAnalyze --> Rewrite["(Query Rewriter) - Improve Query (Optional)"]
-    Rewrite --> Embed["(Embedding Service) - Generate Query Vector"]
-    Embed --> Search["(Retrieval Service) - Search Chunks"]
-    Search --> QD["(Vector DB) - Qdrant"]
-    QD --> Chunks["(Context) - Relevant Chunks"]
-    Chunks --> Rerank["(Reranker) - Reorder Chunks (Optional)"]
-    Rerank --> MLScore["(ML Service) - Score Retrieval (Optional)"]
-    MLScore --> Prompt["(Prompt Builder) - Assemble Context"]
-    Prompt --> LLM["(Model Runtime) - llama.cpp"]
-    LLM --> OutSafe["(Safeguards) - Validate Output"]
-    OutSafe --> Ans["(Response) - Answer with Sources"]
-```
+**User Input**
+A user submits a question to the system.
 
+**Gateway**
+The request is received by the Gateway API, which acts as the entry point for user queries.
 
+**RAG Service**
+The request is forwarded to the RAG orchestration service, which coordinates the entire retrieval and generation pipeline.
+
+**Input Safeguards**
+The query is validated to detect unsafe or malformed inputs.
+
+**Query Analysis (Optional)**
+A machine learning service may analyse the query to determine intent, complexity, or additional metadata.
+
+**Query Rewriting (Optional)**
+The query can be rewritten to improve retrieval accuracy.
+
+**Embedding Generation**
+The processed query is converted into a vector embedding using the embedding service.
+
+**Retrieval Service**
+The retrieval service searches for relevant document chunks using the query vector.
+
+**Vector Database Search**
+The similarity search is executed in Qdrant, which stores the document embeddings.
+
+**Context Retrieval**
+The most relevant chunks are returned as context for the language model.
+
+**Reranking (Optional)**
+A reranker model may reorder the retrieved chunks to improve relevance.
+
+**Retrieval Scoring (Optional)**
+An ML service may evaluate and score the quality of the retrieved results.
+
+**Prompt Construction**
+The prompt builder assembles the final prompt using the user query and the retrieved context.
+
+**Model Execution**
+The prompt is sent to the local model runtime powered by llama.cpp.
+
+**Output Safeguards**
+The generated response is validated to ensure safety and compliance.
+
+**Final Response**
+The system returns the answer along with source references to the user.
 
 This is a good example of why modularity matters. The user experiences one simple chat flow, but the system is actually combining retrieval, ranking, safety checks, and generation behind the scenes.
 
-## 12. Example Request Lifecycle
+## 12. Example Request Lifecycle 🔁
 
 To make the architecture more concrete, here is a simplified lifecycle of a real request when a user asks a question about an uploaded document. The URLs below use the default local development ports from this repository.
 
@@ -742,43 +683,14 @@ Finally, the Gateway returns that response to the frontend, and the answer is di
 
 Here is the same request shown as a sequence trace:
 
-```mermaid
-sequenceDiagram
-    participant user as User
-    participant frontend as ReactFrontend
-    participant gateway as Gateway_8000
-    participant rag as RAGService_8004
-    participant ml as MLService_8005
-    participant embedding as EmbeddingService_8002
-    participant retrieval as RetrievalService_8003
-    participant qdrant as Qdrant_6333
-    participant llm as llamaCpp_8080
 
-    user->>frontend: Ask question about termination conditions
-    frontend->>gateway: POST /chat/
-    gateway->>rag: POST /ask
-    rag->>ml: POST /analyze (optional)
-    ml-->>rag: injection and intent result
-    rag->>embedding: POST /embed
-    embedding-->>rag: embedding vector
-    rag->>retrieval: POST /search
-    retrieval->>qdrant: similarity search
-    qdrant-->>retrieval: matching chunks
-    retrieval-->>rag: text plus source chunks
-    rag->>ml: POST /score (optional)
-    ml-->>rag: retrieval score
-    rag->>llm: completion request with prompt
-    llm-->>rag: grounded answer
-    rag-->>gateway: question, answer, sources
-    gateway-->>frontend: JSON response
-    frontend-->>user: Render answer and sources
-```
+![User Question Sequence trace Image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/193hq5su6nq90kb3kryx.png)
 
 
 
 This section is useful because it shows the system as an actual request trace, not just a conceptual diagram. It makes it easier to see how the services collaborate and how RAG works in practice.
 
-## 13. Improving Retrieval Quality
+## 13. Improving Retrieval Quality 🎯
 
 A basic RAG demo often stops at embedding plus vector search. This project goes further.
 
@@ -800,11 +712,11 @@ One of the nicer features in this repo is optional query rewriting. Short or vag
 
 ### Reranking
 
-The project also supports optional BGE reranking. That means vector search can fetch a wider set of candidates, then a reranker can choose the best chunks to pass into the answer prompt.
+The project also supports optional BGE reranking. That means vector search can fetch a wider set of candidates, and then a reranker can choose the best chunks to pass into the answer prompt.
 
 Together, these choices make the retrieval layer more realistic than a minimal tutorial project.
 
-## 14. Security Considerations
+## 14. Security Considerations 🔐
 
 Local AI does not automatically mean secure AI. You still need defensive layers.
 
@@ -821,28 +733,26 @@ Input validation and context filtering are therefore just as important as model 
 
 The ML and safety layer in this project looks like this:
 
-```mermaid
-flowchart LR
-    Q["(User Query) - Incoming Request"] --> InSafe["(Safeguards) - Input Validation"]
-    InSafe --> Analyze["(ML Service) - Injection and Intent"]
-    Analyze --> Rewrite["(Query Rewriter) - Improve Query (Optional)"]
-    Rewrite --> Embed["(Embedding Service) - Generate Vector"]
-    Embed --> Search["(Retrieval Service) - Search Context"]
-    Search --> Rerank["(Reranker) - Reorder Results (Optional)"]
-    Rerank --> Score["(ML Service) - Retrieval Scoring"]
-    Score --> Prompt["(Prompt Builder) - Compose Prompt"]
-    Prompt --> LLM["(Model Runtime) - LLM Inference"]
-    LLM --> OutSafe["(Safeguards) - Output Validation"]
-    OutSafe --> Resp["(Response) - Final Answer"]
-```
+| Step | What it does | Service / Module | Endpoint / Call Type |
+|-----|-----|-----|-----|
+| User Query | Incoming question | Gateway → RAG | `POST /chat` (Gateway) → `POST /ask` (RAG) |
+| Input Safeguards | Validate input | Safeguard module inside RAG (`backend/services/safeguard`) | In-process `validate_input(...)` |
+| Query Analysis | Injection / intent analysis (optional) | ML Service | `POST /analyze` |
+| Query Rewriter | Improve query text (optional) | Query Rewriter (`backend/shared/query_rewriter`) | In-process `rewrite(...)` |
+| Embedding Service | Generate query vector | Embedding Service | `POST /embed` |
+| Retrieval Service | Search context chunks | Retrieval Service | `POST /search` |
+| Reranker | Reorder results (optional) | Reranker (`backend/shared/reranker`, BGE) | In-process `rerank(...)` |
+| ML Retrieval Scoring | Score retrieved context (optional) | ML Service | `POST /score` |
+| Prompt Builder | Build final prompt with context | Prompt builder (shared helpers in RAG) | In-process prompt assembly |
+| Model Runtime | LLM inference | LLM backend (e.g. llama.cpp) | RAG → LLM HTTP call (`LLM_URL`) |
+| Output Safeguards | Validate model response | Safeguard module inside RAG | In-process `validate_output(...)` |
+| Final Response | Return answer + sources | RAG → Gateway → Client | HTTP response |
 
-
-
-## 15. Performance Optimization
+## 15. Performance Optimization ⚡
 
 Performance in local AI is about balancing model quality, retrieval quality, and resource usage.
 
-Some useful optimization levers visible in this repo are:
+Some useful optimisation levers visible in this repo are:
 
 - Caching opportunities for repeated queries or embeddings
 - Embedding reuse for already-ingested chunks
@@ -852,22 +762,22 @@ Some useful optimization levers visible in this repo are:
 
 The nice thing about a modular design is that you can tune each part independently instead of treating the whole system as one black box.
 
-## 16. Advantages / Pros of a Local AI Stack
+## 16. Advantages / Pros of a Local AI Stack ✅
 
 If you want the short version, these are the main pros of this architecture:
 
 - Full control over document data
 - More predictable operational cost
-- Freedom to customize models and providers
+- Freedom to customise models and providers
 - Flexible service boundaries
 - Better fit for internal tools and private deployments
 - A path to support both web users and AI agents through the same backend
 
-The last point is worth highlighting. This repo does not only expose a frontend. It also includes an MCP server, which means AI agents can search documents, ask grounded questions, and ingest text using the same backend services.
+The last point is worth highlighting. This repo not only exposes a frontend. It also includes an MCP server, which means AI agents can search documents, ask grounded questions, and ingest text using the same backend services.
 
 That matters because it turns the project from a simple web app into a more reusable AI platform. The same monorepo supports browser users, backend APIs, and agent tooling without duplicating business logic.
 
-## 17. Limitations / Cons and Tradeoffs
+## 17. Limitations / Cons and Tradeoffs ⚖️
 
 A local-first approach is powerful, but it is not magic.
 
@@ -906,7 +816,7 @@ When you own the stack, you also own more operational work:
 
 That is the tradeoff for greater control.
 
-## 18. Future Improvements
+## 18. Future Improvements 🗺️
 
 This project already implements more than a minimal RAG demo, but there is still room to grow.
 
@@ -921,7 +831,7 @@ Some especially valuable next steps are:
 
 Because the project already uses stable service boundaries and config-driven backends, those improvements can be added incrementally instead of requiring a full redesign.
 
-## 19. Refactoring Path: LangChain, LlamaIndex, or Bedrock
+## 19. Refactoring Path: LangChain, LlamaIndex, or Bedrock 🛣️
 
 One advantage of this architecture is that it does not lock the project into one implementation style forever. Because the system is already separated into services with stable contracts, it can be refactored gradually to use higher-level frameworks or managed cloud providers.
 
@@ -976,9 +886,9 @@ This is exactly why I prefer a modular monorepo for projects like this. The curr
 
 That flexibility makes the project more realistic from a software engineering perspective.
 
-## 20. Conclusion
+## 20. Conclusion 🧵
 
-This repository demonstrates that you can build a serious AI application without making OpenAI the center of the architecture.
+This repository demonstrates that you can build a serious AI application without making OpenAI the centre of the architecture.
 
 The system combines local embeddings, vector search, document ingestion, retrieval orchestration, safeguards, reranking, query rewriting, optional ML analysis, MCP-based agent access, and local LLM inference into one coherent stack. It also shows an important design principle: local-first does not have to mean rigid. By keeping the interfaces stable inside a multi-service monorepo, the system stays flexible enough to support alternative backends later.
 
@@ -986,7 +896,7 @@ Local AI makes the most sense when you care about privacy, predictable cost, int
 
 For me, that is the biggest takeaway from building this project: the interesting part is not just calling a model. It is designing the full pipeline around retrieval quality, data ownership, extensibility, and real product constraints.
 
-## Demoing This Repo
+## Demoing This Repo 🎬
 
 If you want to use this article together with a live demo, the shortest path is:
 
@@ -998,7 +908,8 @@ make frontend
 
 When everything is up and running locally, it looks like this:
 
-![All services running locally](up-and-running-all.png)
+
+![Up And Running Image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/zvvwez4rzyvzz5cjvyxz.png)
 
 Then:
 

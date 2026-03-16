@@ -1,17 +1,17 @@
-# MCP Server (AI Agent Access)
+# MCP Server (AI Agent Access) 🧩
 
 The Document RAG system can be used as a **tool provider** for AI agents (Cursor, Claude Desktop, etc.) via the **Model Context Protocol (MCP)**. The MCP server exposes three tools that call the existing RAG services over HTTP. It acts as a thin orchestration layer: no changes to backend service logic, only a new client that agents can connect to.
 
 ---
 
-## Prerequisites
+## Prerequisites ✅
 
 - **Python 3.11+**
 - Backend services running (Embedding, Retrieval, RAG, Ingestion). See [local-development.md](local-development.md) or run `make up` for Docker.
 
 ---
 
-## Install
+## Install 📦
 
 From the project root:
 
@@ -29,7 +29,7 @@ Or use the backend venv and install MCP deps there:
 
 ---
 
-## Configuration
+## Configuration ⚙️
 
 Set these environment variables if your services are not on localhost (defaults are for local dev):
 
@@ -45,7 +45,7 @@ Optional: create `mcp_service/.env` or set env in your shell before running the 
 
 ---
 
-## Run the MCP server
+## Run the MCP server ▶️
 
 From the **project root** (so that `mcp_service` is a resolvable package):
 
@@ -63,7 +63,7 @@ The server runs over **stdio** by default. Keep it running and point your MCP cl
 
 ---
 
-## Connect from Cursor
+## Connect from Cursor 💻
 
 1. Open Cursor settings (e.g. **Cursor Settings → MCP** or the MCP configuration file).
 2. Add a new MCP server. Example configuration (adjust paths to your repo):
@@ -79,7 +79,7 @@ The server runs over **stdio** by default. Keep it running and point your MCP cl
 
 ---
 
-## Connect from Claude Desktop
+## Connect from Claude Desktop 🖥️
 
 1. Edit your Claude Desktop MCP config (e.g. `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS).
 2. Add a server entry that runs the MCP server, for example:
@@ -100,7 +100,7 @@ The server runs over **stdio** by default. Keep it running and point your MCP cl
 
 ---
 
-## Tools
+## Tools 🧰
 
 | Tool | Input | Description |
 |------|--------|-------------|
@@ -110,7 +110,7 @@ The server runs over **stdio** by default. Keep it running and point your MCP cl
 
 ---
 
-## Example use (from an agent)
+## Example use (from an agent) 🤖
 
 - **Search:** “Find passages about authentication” → agent calls `search_documents(query="authentication")` and gets formatted chunks.
 - **Ask:** “What does this doc say about security?” → agent calls `ask_rag(question="What does this doc say about security?")` and gets an answer with sources.
@@ -118,7 +118,7 @@ The server runs over **stdio** by default. Keep it running and point your MCP cl
 
 ---
 
-## Tests
+## Tests 🧪
 
 From the project root, with a venv that has `mcp_service` dependencies installed:
 

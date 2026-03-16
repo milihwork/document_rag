@@ -1,8 +1,8 @@
-# Adding New Backends (Modular Architecture)
+# Adding New Backends (Modular Architecture) 🔌
 
 The repo uses **config-driven backends** for embeddings, vector store, and LLM. You can add AWS Bedrock, pgvector, OpenAI, etc. by implementing one backend module and setting the right env var. No changes are needed in the Gateway, Ingestion, or frontend.
 
-## Overview
+## Overview 🧭
 
 | Area | Config key | Service | Initial backend | Add by implementing |
 |------|------------|---------|------------------|----------------------|
@@ -13,7 +13,7 @@ The repo uses **config-driven backends** for embeddings, vector store, and LLM. 
 
 ---
 
-## 1. New Embedding Backend (e.g. Bedrock)
+## 1. New Embedding Backend (e.g. Bedrock) 🧠
 
 **Contract:** Same as existing backends:
 
@@ -32,7 +32,7 @@ The repo uses **config-driven backends** for embeddings, vector store, and LLM. 
 
 ---
 
-## 2. Vector Backend: pgvector (implemented)
+## 2. Vector Backend: pgvector (implemented) 🗄️
 
 **Contract:** Same as existing backends:
 
@@ -50,7 +50,7 @@ Implementation: `backend/services/retrieval/app/backends/pgvector.py`. Ingestion
 
 ---
 
-## 3. LLM Backend: OpenAI (implemented) and others
+## 3. LLM Backend: OpenAI (implemented) and others 🤖
 
 **Contract:** Same as existing backends:
 
@@ -73,7 +73,7 @@ Implementation: `backend/services/rag/app/backends/openai_backend.py`. The Gatew
 
 ---
 
-## 4. Reranker backend: BGE (implemented) and adding new rerankers
+## 4. Reranker backend: BGE (implemented) and adding new rerankers 🎯
 
 **Contract:** Same as existing reranker backends:
 
@@ -94,7 +94,7 @@ Implementation: `backend/services/reranker/` (base, bge_reranker, factory). RAG 
 
 ---
 
-## Env Summary
+## Env Summary ⚙️
 
 - **Embedding:** `EMBEDDING_BACKEND=local|bedrock|openai`; backend-specific vars per implementation.
 - **Retrieval:** `VECTOR_BACKEND=qdrant|pgvector`; backend-specific vars (e.g. `QDRANT_*` for qdrant; `DATABASE_URL`, `PGVECTOR_TABLE_NAME` for pgvector).

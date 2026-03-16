@@ -1,6 +1,6 @@
-# Query Rewriter
+# Query Rewriter ✏️
 
-## Overview
+## Overview 🧭
 
 The Query Rewriter is an optional component in the RAG pipeline that transforms vague or poorly structured user queries into clearer, more descriptive queries before vector search. This improves embedding quality and document retrieval accuracy.
 
@@ -16,7 +16,7 @@ The rewritten query is **only used for retrieval** (embedding and vector search)
 
 ---
 
-## Architecture
+## Architecture 🏗️
 
 ```mermaid
 flowchart LR
@@ -35,7 +35,7 @@ The Query Rewriter sits between the Safeguard and Embedding steps. It uses the s
 
 ---
 
-## Configuration
+## Configuration ⚙️
 
 | Environment Variable | Default | Description |
 |---------------------|---------|-------------|
@@ -61,7 +61,7 @@ Set `QUERY_REWRITING_ENABLED=false` to disable query rewriting entirely. This is
 
 ---
 
-## Module Structure
+## Module Structure 🧩
 
 ```
 backend/shared/query_rewriter/
@@ -91,7 +91,7 @@ The `LLMQueryRewriter` uses the configured LLM backend to rewrite queries:
 
 ---
 
-## How It Works
+## How It Works 🔍
 
 ### Pipeline Flow
 
@@ -113,7 +113,7 @@ The `LLMQueryRewriter` uses the configured LLM backend to rewrite queries:
 
 ---
 
-## Logging
+## Logging 📓
 
 Both original and rewritten queries are logged for observability:
 
@@ -125,7 +125,7 @@ This helps debug retrieval issues by comparing what was searched vs. what was as
 
 ---
 
-## Adding a New Rewriter Provider
+## Adding a New Rewriter Provider 🔌
 
 To add a custom query rewriter:
 
@@ -141,7 +141,7 @@ if provider == "my_provider":
 
 ---
 
-## Test Cases
+## Test Cases 🧪
 
 ### CV/Resume Queries
 
@@ -174,7 +174,7 @@ If you've uploaded a CV/resume, test these queries:
 
 ---
 
-## Troubleshooting
+## Troubleshooting 🛠️
 
 ### Query Not Being Rewritten
 

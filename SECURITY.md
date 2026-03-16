@@ -1,6 +1,6 @@
-# Security policy
+# Security policy 🔐
 
-## Reporting a vulnerability
+## Reporting a vulnerability 🚨
 
 If you believe you have found a security vulnerability in this project, please report it responsibly:
 

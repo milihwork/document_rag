@@ -1,12 +1,12 @@
-# Architecture
+# Architecture 🏗️
 
-## Overview
+## Overview 🧭
 
 Document RAG is a local RAG (Retrieval Augmented Generation) system for document question-answering. The backend is split into **separated services** with **config-driven backends** for embeddings, vector store, and LLM. The frontend talks only to the Gateway; adding Bedrock, pgvector, or other providers is done by implementing a backend and setting config—no changes to callers. See [backends.md](backends.md) for how to add new backends.
 
 ---
 
-## Target architecture
+## Target architecture 🎯
 
 ![Architecture diagram](architecture.png)
 
@@ -57,7 +57,7 @@ Within the RAG service, the pipeline runs **input safeguard** (before embedding)
 
 ---
 
-## Modular backends (config-driven)
+## Modular backends (config-driven) 🔌
 
 Three areas are **modular backends**: one implementation is chosen via config; callers depend only on the stable HTTP contract. Adding Bedrock, pgvector, or another provider = new backend implementation + config, no changes to other services.
 
@@ -103,7 +103,7 @@ Each owning service (Embedding, Retrieval, RAG) loads the backend from config an
 
 ---
 
-## Service boundaries and APIs
+## Service boundaries and APIs 🌐
 
 | Service | Responsibility | HTTP API | Calls |
 |---------|----------------|----------|-------|
@@ -119,7 +119,7 @@ Frontend continues to call the Gateway only (same paths and payloads as before).
 
 ---
 
-## Repository layout (monorepo)
+## Repository layout (monorepo) 🗂️
 
 Under `backend/`:
 
@@ -139,7 +139,7 @@ Under `backend/`:
 
 ---
 
-## Configuration per service
+## Configuration per service ⚙️
 
 | Service | Environment variables |
 |---------|------------------------|
@@ -154,7 +154,7 @@ Each service has its own `config/settings.py` (or equivalent) loaded from env.
 
 ---
 
-## Docker and runtime
+## Docker and runtime 🐳
 
 - **docker-compose.yml**: Services `gateway` (port 8000), `ingestion` (8001), `embedding` (8002), `retrieval` (8003), `rag` (8004), `ml` (8005), plus `qdrant`. Gateway depends on ingestion and rag; ingestion depends on embedding and retrieval; rag depends on embedding, retrieval, and ml. LLM remains external (`LLM_URL` pointing to host or existing LLM container).
 - **Dockerfiles**: One per service under `backend/services/<name>/Dockerfile`; build context `backend/` so shared code is available.
@@ -162,7 +162,7 @@ Each service has its own `config/settings.py` (or equivalent) loaded from env.
 
 ---
 
-## Adding a new backend (extensibility)
+## Adding a new backend (extensibility) 🚀
 
 To add a new provider without changing callers:
 

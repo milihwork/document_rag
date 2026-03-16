@@ -1,10 +1,10 @@
-# ML Service
+# ML Service 🧠
 
 The ML Service provides LLM-based analysis for the RAG pipeline, including prompt injection detection, query intent classification, and retrieval quality scoring.
 
 ---
 
-## Overview
+## Overview 🧭
 
 The ML Service is an optional component that enhances the RAG pipeline with additional security and quality checks:
 
@@ -35,7 +35,7 @@ flowchart LR
 
 ---
 
-## Components
+## Components 🧩
 
 ### 1. Injection Detector
 
@@ -105,7 +105,7 @@ Evaluates the quality of retrieved chunks after reranking.
 
 ---
 
-## API Endpoints
+## API Endpoints 🌐
 
 ### POST /analyze
 
@@ -175,7 +175,7 @@ Health check endpoint.
 
 ---
 
-## Configuration
+## Configuration ⚙️
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -189,7 +189,7 @@ Health check endpoint.
 
 ---
 
-## RAG Integration
+## RAG Integration 🔗
 
 Enable the ML Service in RAG by setting:
 
@@ -217,7 +217,7 @@ If the ML Service is unavailable:
 
 ---
 
-## Running Locally
+## Running Locally 💻
 
 ### With Docker
 
@@ -238,7 +238,7 @@ PYTHONPATH=. uvicorn services.ml.app.main:app --port 8005
 
 ---
 
-## Testing
+## Testing 🧪
 
 Run ML service tests:
 
@@ -255,7 +255,7 @@ Test categories:
 
 ---
 
-## Extensibility
+## Extensibility 🔌
 
 ### Adding a New Classifier
 

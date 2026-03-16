@@ -1,4 +1,4 @@
-# Document RAG AI
+# Document RAG AI 📚🤖
 
 ![Document RAG cover](docs/readme_cover.png)
 
@@ -8,7 +8,7 @@ Upload PDF documents, ask questions, and receive answers grounded in your docume
 
 This project is designed as a small AI platform rather than a single demo script: it includes ingestion, chunking, embeddings, vector search, reranking, query rewriting, answer generation, source attribution, and optional LLM-based analysis. The system is built with a **service-oriented architecture** and **pluggable AI backends** so core components can be swapped without changing the public APIs.
 
-## Table of contents
+## Table of contents 🧭
 
 * [Why This Project Stands Out](#why-this-project-stands-out)
 * [Demo Guide](#demo-guide)
@@ -33,7 +33,7 @@ This project is designed as a small AI platform rather than a single demo script
 
 *[↑ Full Architecture section](#architecture)*
 
-## Why This Project Stands Out
+## Why This Project Stands Out 🚀
 
 * Runs fully local by default with `sentence-transformers`, Qdrant, and `llama.cpp`
 * Implements a complete end-to-end RAG pipeline instead of simple prompt forwarding
@@ -42,7 +42,7 @@ This project is designed as a small AI platform rather than a single demo script
 * Exposes the same platform through a React UI, Gateway API, and MCP tools for AI agents
 * Demonstrates full-stack delivery with FastAPI services, Express Gateway, Docker workflow, CI, and local development docs
 
-## Demo Guide
+## Demo Guide 🎬
 
 See [docs/demo.md](docs/demo.md). It includes a short demo flow, sample prompts, and what to point out when presenting the project.
 
@@ -52,9 +52,9 @@ For the full documentation map, see [docs/README.md](docs/README.md).
 
 ---
 
-# Features
+# Features ✨
 
-### Core RAG workflow
+### Core RAG workflow 🧠
 
 * PDF document ingestion for searchable knowledge bases
 * Raw text ingestion for automation and MCP-driven workflows
@@ -62,19 +62,19 @@ For the full documentation map, see [docs/README.md](docs/README.md).
 * Grounded answer generation with source attribution
 * Local-first question answering with no external API keys required by default
 
-### Retrieval quality
+### Retrieval quality 🎯
 
 * Optional query rewriting for short or vague user questions
 * Optional BGE reranking for better context selection
 * Configurable retrieval depth such as `TOP_K`, `VECTOR_SEARCH_TOP_K`, and `RERANK_TOP_K`
 
-### Safety and analysis
+### Safety and analysis 🛡️
 
 * Configurable input safeguards for prompt injection and blocked topics
 * Configurable output safeguards for sensitive or disallowed responses
 * Optional ML service for prompt injection detection, query classification, retrieval scoring, and document classification
 
-### Platform architecture
+### Platform architecture 🏗️
 
 * Multi-service monorepo with clear service boundaries
 * Python `FastAPI` backend services for ingestion, embedding, retrieval, RAG, and ML
@@ -82,20 +82,20 @@ For the full documentation map, see [docs/README.md](docs/README.md).
 * React frontend for upload and chat workflows
 * MCP server so AI agents can search, ask questions, and ingest content as tools
 
-### Extensibility
+### Extensibility 🔌
 
 * Config-driven backends for embeddings, vector databases, and LLM providers
 * Default local stack with `sentence-transformers`, Qdrant, and `llama.cpp`
 * Alternative and extensible backends including `pgvector`, `openai`, and Bedrock-oriented extension points
 
-### Developer experience
+### Developer experience 💻
 
 * Docker workflow for running the stack locally
 * Local development guide for running services individually
 * OpenAPI docs exposed by the Gateway
 * Tests, linting, CI, contributing guide, and security policy
 
-## Local AI Stack
+## Local AI Stack 🧱
 
 The default stack runs fully locally:
 
@@ -107,7 +107,7 @@ The default stack runs fully locally:
 
 No external API keys required.
 
-## Implemented vs Planned
+## Implemented vs Planned 📌
 
 | Area | Implemented now | Planned / future |
 | ---- | --------------- | ---------------- |
@@ -122,7 +122,7 @@ No external API keys required.
 
 ---
 
-# Architecture
+# Architecture 🏛️
 
 The system uses a **service-based RAG architecture** where each service is responsible for a specific part of the AI pipeline.
 
@@ -181,7 +181,7 @@ For config-driven provider backends and extension points, see [docs/backends.md]
 
 ---
 
-# Prerequisites
+# Prerequisites ✅
 
 * Python **3.11+**
 * Node.js **18+** (frontend and Gateway)
@@ -191,9 +191,9 @@ For config-driven provider backends and extension points, see [docs/backends.md]
 
 ---
 
-# Quick Start
+# Quick Start ⚡
 
-## First-time setup (after clone)
+## First-time setup (after clone) 🆕
 
 Do these **once** after cloning the repo:
 
@@ -201,7 +201,7 @@ Do these **once** after cloning the repo:
 2. **Local LLM:** Run `make init-llama`, then download a GGUF model and place it in `models/`. See [models/README.md](models/README.md) for the default filename and download link.
 3. Then follow the steps below to start the backend, LLM, and frontend.
 
-## Optional configuration
+## Optional configuration ⚙️
 
 If you want to override defaults, create a repo-wide env file first:
 
@@ -211,7 +211,7 @@ cp .env.example .env
 
 Both Docker Compose and the Python backend services read the root `.env`. If you are happy with the defaults, you can skip this step.
 
-## Start backend services
+## Start backend services 🧩
 
 From the project root:
 
@@ -221,7 +221,7 @@ make up
 
 This starts Gateway, Ingestion, Embedding, Retrieval, RAG, ML, and Qdrant in Docker. Data persists in the `qdrant_data` volume. Set `LLM_URL` if your llama.cpp server is not at `http://localhost:8080` (e.g. on Mac/Windows use `LLM_URL=http://host.docker.internal:8080`).
 
-## Start the LLM
+## Start the LLM 🤖
 
 In another terminal, run the LLM on your host (required for chat):
 
@@ -231,7 +231,7 @@ If this is your first run, set up the local LLM runtime once with `make init-lla
 make llm
 ```
 
-## Start the frontend
+## Start the frontend 🖥️
 
 ```bash
 make frontend
@@ -247,7 +247,7 @@ To rebuild images after code changes: `make build` then `make up`. To stop conta
 
 ---
 
-# Local Development
+# Local Development 💻
 
 Run services on your machine with **only Qdrant in Docker**. The Gateway runs in Node.js; the other backend services run in Python.
 
@@ -271,7 +271,7 @@ For the full step-by-step, prerequisites, and port table, see **[Local developme
 
 ---
 
-# API Endpoints
+# API Endpoints 🌐
 
 | Endpoint   | Method | Description    |
 | ---------- | ------ | -------------- |
@@ -283,7 +283,7 @@ For the full step-by-step, prerequisites, and port table, see **[Local developme
 
 ---
 
-# Configuration
+# Configuration ⚙️
 
 For a repo-wide configuration file used by Docker Compose and the Python services, copy the root template:
 
@@ -308,7 +308,7 @@ The root `.env` is the recommended place to set values such as `LLM_URL`, `ML_SE
 
 ---
 
-# Development
+# Development 🛠️
 
 ## Run tests
 
@@ -322,14 +322,14 @@ make test
 cd frontend && npm run build
 ```
 
-## Project Policies
+## Project Policies 📜
 
 * [Contributing guide](CONTRIBUTING.md)
 * [Security policy](SECURITY.md)
 * [MIT license](LICENSE)
 * [CI workflow](.github/workflows/ci.yml)
 
-## Troubleshooting
+## Troubleshooting 🧪
 
 **RAG container exits at startup (Docker):** Rebuild the RAG image so the in-container layout and `services` package are correct: `docker compose build --no-cache rag`, then `docker compose up rag`. If it still fails, run `docker compose logs rag` and check the last lines of the traceback.
 
@@ -337,7 +337,7 @@ cd frontend && npm run build
 
 ---
 
-# Project Structure
+# Project Structure 🗂️
 
 ```
 document_rag/
@@ -376,7 +376,7 @@ document_rag/
 
 ---
 
-# Security and Safeguards
+# Security and Safeguards 🔐
 
 The RAG pipeline is protected by **configurable input and output safeguards** that run inside the RAG service. They block prompt injection attempts, disallowed topics, and sensitive content in responses. Safeguards can be enabled/disabled and the provider (e.g. pattern-based `basic`) can be swapped via environment variables. All rules are centralized in `backend/shared/safeguard_constants.py`. See [docs/safeguards.md](docs/safeguards.md) for configuration and how to add new safeguard providers.
 
@@ -388,7 +388,7 @@ Future versions may add:
 
 ---
 
-# Roadmap and Future Improvements
+# Roadmap and Future Improvements 🗺️
 
 Planned improvements include:
 
@@ -402,6 +402,6 @@ Planned improvements include:
 
 ---
 
-# License
+# License 📄
 
 MIT

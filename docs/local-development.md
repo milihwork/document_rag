@@ -1,17 +1,17 @@
-# Local development (Docker only for Qdrant)
+# Local development (Docker only for Qdrant) 💻
 
 Run the Gateway, Ingestion, Embedding, Retrieval, RAG, frontend, and LLM on your host; only Qdrant runs in Docker.
 
-## Prerequisites
+## Prerequisites ✅
 
 - Python 3.11+
 - Node.js (for the frontend and the Gateway; LTS recommended)
 - Docker (for Qdrant only)
 - Optional: [llama.cpp](https://github.com/ggerganov/llama.cpp) and a GGUF model for the LLM (or set `LLM_URL` to another server)
 
-## Steps (in order)
+## Steps (in order) 🧭
 
-### 1. Start Qdrant
+### 1. Start Qdrant 🗄️
 
 From the project root:
 
@@ -21,7 +21,7 @@ make qdrant
 
 This starts the Qdrant container on port 6333 with persistent storage. Leave it running.
 
-### 2. Backend Python environment
+### 2. Backend Python environment 🐍
 
 From the project root:
 
@@ -42,7 +42,7 @@ The Python backend services load the root `.env`, so this is the recommended pla
 
 Defaults already point to `http://localhost:8001`–`8004` for the four Python services plus the Gateway and `localhost:6333` for Qdrant, so no extra env is required for local inter-service URLs.
 
-### 3. Gateway Node.js environment
+### 3. Gateway Node.js environment 🌉
 
 From the project root:
 
@@ -52,7 +52,7 @@ npm install
 cd ../../..
 ```
 
-### 4. Start the backend services
+### 4. Start the backend services ▶️
 
 Run each command in its **own terminal**, from the **project root**:
 
@@ -87,7 +87,7 @@ Recommended order: start **Embedding** and **Retrieval** first (they only depend
 
 If you see "Upstream error while proxying chat request" in the UI, ensure the RAG service is running on port 8004 and that the Gateway can reach it (check `RAG_URL` if you run Gateway in Docker).
 
-### 5. Start the LLM
+### 5. Start the LLM 🤖
 
 In another terminal (from the project root):
 
@@ -99,7 +99,7 @@ make llm
 
 Or run your own LLM server and set `LLM_URL` in the root `.env` (for example `LLM_URL=http://localhost:8080`). The RAG service uses this URL for completions.
 
-### 6. Start the frontend
+### 6. Start the frontend 🖥️
 
 In another terminal:
 
@@ -109,7 +109,7 @@ make frontend
 
 The Vite dev server runs at http://localhost:5173 and proxies `/api` to the Gateway at http://localhost:8000. Open the URL shown in the terminal. OpenAPI docs (interactive UI) are at http://localhost:8000/openapi/docs when the Gateway is running; the spec is at http://localhost:8000/openapi.json.
 
-### 7. MCP server (optional)
+### 7. MCP server (optional) 🧩
 
 To use the RAG system as an MCP tool provider for Cursor, Claude Desktop, or other MCP-compatible clients:
 
@@ -126,7 +126,7 @@ To use the RAG system as an MCP tool provider for Cursor, Claude Desktop, or oth
 
 See [mcp.md](mcp.md) for full setup, environment variables, and tool descriptions.
 
-## Reference: components and ports
+## Reference: components and ports 🔢
 
 | Component | Command | Port |
 |-----------|---------|------|
@@ -141,7 +141,7 @@ See [mcp.md](mcp.md) for full setup, environment variables, and tool description
 | Frontend | `make frontend` | 5173 |
 | MCP Server | `make run-mcp` | stdio (no port) |
 
-## Optional: environment variables
+## Optional: environment variables ⚙️
 
 If you use the root `.env`, common variables include:
 
@@ -150,7 +150,7 @@ If you use the root `.env`, common variables include:
 
 Service URLs (e.g. `EMBEDDING_URL`, `RETRIEVAL_URL`) default to `http://localhost:8002`, `http://localhost:8003`, etc., so they do not need to be set when running everything on the host.
 
-## Linting
+## Linting ✅
 
 From the project root you can run:
 

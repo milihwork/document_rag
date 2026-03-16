@@ -1,10 +1,10 @@
-# Safeguards
+# Safeguards 🛡️
 
 The RAG pipeline is protected by **configurable input and output safeguards**. They run inside the RAG service: the **input safeguard** validates the user query before embedding and search; the **output safeguard** validates the LLM response before it is returned. Blocked requests or responses return HTTP 403 with a clear error message.
 
 ---
 
-## Overview
+## Overview 🧭
 
 Safeguards help protect against:
 
@@ -16,7 +16,7 @@ Safeguards are **modular** (you can add new providers) and **config-driven** (en
 
 ---
 
-## Where rules live
+## Where rules live 📂
 
 All blocked patterns and topics are defined in:
 
@@ -30,7 +30,7 @@ Edit this file to add or remove rules. No code changes are required in the safeg
 
 ---
 
-## Configuration
+## Configuration ⚙️
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -45,7 +45,7 @@ SAFEGUARD_ENABLED=false
 
 ---
 
-## Current provider: `basic`
+## Current provider: `basic` 🧩
 
 The **basic** safeguard:
 
@@ -56,7 +56,7 @@ Blocked requests are logged at WARNING (e.g. "Query blocked by safeguard: ...") 
 
 ---
 
-## Adding a new safeguard provider
+## Adding a new safeguard provider 🔌
 
 1. In `backend/services/safeguard/`, add a new module (e.g. `advanced_guard.py`).
 2. Implement a class that inherits from `BaseSafeguard` and defines:
@@ -69,7 +69,7 @@ The RAG service and Gateway do not need changes; they already call the safeguard
 
 ---
 
-## Future improvements
+## Future improvements 🗺️
 
 Possible extensions (not implemented yet):
 
