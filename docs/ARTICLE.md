@@ -1,3 +1,4 @@
+**Published:** [How I Built a Local-First AI Stack for Document Q&A Without OpenAI](https://dev.to/mili_hunjic_70cb2c5dd0e49/how-i-built-a-local-first-ai-stack-for-document-qa-without-openai-364) (DEV Community)
 
 ![Article Cover Image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/obbvzdfqt8aawvwuvy3t.png)
 
