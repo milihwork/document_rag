@@ -26,7 +26,7 @@
 * [3. Why Build AI Without OpenAI](#3-why-build-ai-without-openai)
 * [4. Use Cases for Local AI](#4-use-cases-for-local-ai)
 * [5. Key Concepts Behind the System](#5-key-concepts-behind-the-system)
-* [6. High-Level Architecture](#6-high-level-architecture)
+* [6. High Level Architecture](#6-high-level-architecture)
 * [7. Technology Stack](#7-technology-stack)
 * [8. System Components Explained](#8-system-components-explained)
 * [9. Document Ingestion Pipeline](#9-document-ingestion-pipeline)
@@ -36,12 +36,12 @@
 * [13. Improving Retrieval Quality](#13-improving-retrieval-quality)
 * [14. Security Considerations](#14-security-considerations)
 * [15. Performance Optimization](#15-performance-optimization)
-* [16. Advantages / Pros of a Local AI Stack](#16-advantages--pros-of-a-local-ai-stack)
-* [17. Limitations / Cons and Tradeoffs](#17-limitations--cons-and-tradeoffs)
+* [16. Advantages And Pros of a Local AI Stack](#16-advantages-and-pros-of-a-local-ai-stack)
+* [17. Limitations And Cons and Tradeoffs](#17-limitations-and-cons-and-tradeoffs)
 * [18. Future Improvements](#18-future-improvements)
 * [19. Refactoring Path: LangChain, LlamaIndex, or Bedrock](#19-refactoring-path-langchain-llamaindex-or-bedrock)
 * [20. Conclusion](#20-conclusion)
-* [Demoing This Repo](#demoing-this-repo)
+* [21. Demoing This Repo](#21-demoing-this-repo)
 
 Most AI tutorials still follow the same recipe: call OpenAI, print the response, and label it an AI application.
 
@@ -51,9 +51,10 @@ I wanted to build something closer to a real product: a local-first AI system th
 
 That is what `document_rag` is. It is a local-first Retrieval-Augmented Generation (RAG) platform for uploading documents, retrieving relevant context, and answering questions with sources. By default, it runs locally without requiring OpenAI, and it is structured as a multi-service monorepo with an MCP server so tools like Cursor or Claude Desktop can also use the same platform.
 
-You can find the full source code on GitHub at `https://github.com/milihwork/document_rag`.
+You can find the full source code on GitHub at [GitHub](https://github.com/milihwork/document_rag).
 
 In this article, I will walk through the architecture, the tech stack, the tradeoffs, and why building AI locally is worth considering in the first place.
+
 
 ## 1. Introduction 🌱
 
@@ -69,6 +70,7 @@ The easiest way to build these systems is to rely entirely on hosted providers s
 Running AI locally is one answer to those concerns.
 
 In this project, I built a local-first RAG system that ingests PDFs and text, chunks them, turns them into embeddings, stores them in a vector database, retrieves relevant context for a question, and then generates an answer with a local LLM. It lives in a monorepo that contains the frontend, backend services, shared modules, and an MCP server for agent access. The article shows how that stack fits together and why this architecture is useful beyond a demo.
+
 
 ## 2. What Is a Local AI Stack 🧱
 
@@ -99,6 +101,7 @@ In `document_rag`, the default local stack is:
 
 From a repository-design perspective, this is also a monorepo: multiple related applications and services live in one Git repository, share documentation and infrastructure, and work together as one system.
 
+
 ## 3. Why Build AI Without OpenAI 💸
 
 There is nothing wrong with OpenAI or other cloud providers. They are excellent tools. But there are solid engineering reasons to build a system that does not require them by default.
@@ -127,6 +130,7 @@ If the whole product depends on one hosted provider, switching later can be pain
 
 Some tools need to run on internal networks, development laptops, or restricted environments. A local-first design makes those scenarios practical.
 
+
 ## 4. Use Cases for Local AI 🎯
 
 A local AI stack is especially useful for:
@@ -138,6 +142,7 @@ A local AI stack is especially useful for:
 - Teams in regulated industries that want stronger control over data flow
 
 This repository focuses on document question answering, but the same architecture can support internal wikis, policy assistants, onboarding tools, legal document review support, and research archives.
+
 
 ## 5. Key Concepts Behind the System 🧠
 
@@ -168,9 +173,8 @@ In practice, RAG combines retrieval and generation:
 
 That grounding is what makes RAG more useful for document-based assistants than raw prompting alone.
 
-## 6. High-Level Architecture 🏗️
 
-
+## 6. High Level Architecture 🏗️
 ![High-Level Architecture Image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ozq2r6jn92r55en7y72e.png)
 
 At a high level, the system is split into focused services instead of a single large app:
@@ -204,6 +208,7 @@ There is also a second access path besides the browser UI: the MCP server expose
 
 That separation makes the system easier to reason about, replace, and extend.
 
+
 ## 7. Technology Stack 🧰
 
 Here is the concrete stack used in this project.
@@ -223,6 +228,7 @@ Here is the concrete stack used in this project.
 
 
 One thing I like about this setup is that it stays practical. The default stack is local-first, but the interfaces are designed so that changing a backend does not force a full rewrite of the product.
+
 
 ## 8. System Components Explained 🧩
 
@@ -320,6 +326,7 @@ Each chunk is sent to the Embedding service, which returns vector representation
 ### Storing vectors
 
 The Retrieval service upserts the vectors into Qdrant, making the document searchable for future queries.
+
 
 ## 10. Example Document Ingestion Lifecycle 🔄
 
@@ -452,6 +459,7 @@ Here is the same ingestion flow shown as a sequence trace:
 
 This flow is useful because it shows that ingestion is not just file upload. It is a full indexing pipeline: parsing, chunking, embedding, and vector storage. That is what makes later RAG queries possible.
 
+
 ## 11. Query Processing Flow 🔍
 
 Question answering follows a similar service-oriented path:
@@ -521,6 +529,7 @@ The generated response is validated to ensure safety and compliance.
 The system returns the answer along with source references to the user.
 
 This is a good example of why modularity matters. The user experiences one simple chat flow, but the system is actually combining retrieval, ranking, safety checks, and generation behind the scenes.
+
 
 ## 12. Example Request Lifecycle 🔁
 
@@ -687,8 +696,8 @@ Here is the same request shown as a sequence trace:
 ![User Question Sequence trace Image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/193hq5su6nq90kb3kryx.png)
 
 
-
 This section is useful because it shows the system as an actual request trace, not just a conceptual diagram. It makes it easier to see how the services collaborate and how RAG works in practice.
+
 
 ## 13. Improving Retrieval Quality 🎯
 
@@ -715,6 +724,7 @@ One of the nicer features in this repo is optional query rewriting. Short or vag
 The project also supports optional BGE reranking. That means vector search can fetch a wider set of candidates, and then a reranker can choose the best chunks to pass into the answer prompt.
 
 Together, these choices make the retrieval layer more realistic than a minimal tutorial project.
+
 
 ## 14. Security Considerations 🔐
 
@@ -748,6 +758,7 @@ The ML and safety layer in this project looks like this:
 | Output Safeguards | Validate model response | Safeguard module inside RAG | In-process `validate_output(...)` |
 | Final Response | Return answer + sources | RAG → Gateway → Client | HTTP response |
 
+
 ## 15. Performance Optimization ⚡
 
 Performance in local AI is about balancing model quality, retrieval quality, and resource usage.
@@ -762,7 +773,8 @@ Some useful optimisation levers visible in this repo are:
 
 The nice thing about a modular design is that you can tune each part independently instead of treating the whole system as one black box.
 
-## 16. Advantages / Pros of a Local AI Stack ✅
+
+## 16. Advantages And Pros of a Local AI Stack ✅
 
 If you want the short version, these are the main pros of this architecture:
 
@@ -777,7 +789,8 @@ The last point is worth highlighting. This repo not only exposes a frontend. It 
 
 That matters because it turns the project from a simple web app into a more reusable AI platform. The same monorepo supports browser users, backend APIs, and agent tooling without duplicating business logic.
 
-## 17. Limitations / Cons and Tradeoffs ⚖️
+
+## 17. Limitations And Cons and Tradeoffs ⚖️
 
 A local-first approach is powerful, but it is not magic.
 
@@ -816,6 +829,7 @@ When you own the stack, you also own more operational work:
 
 That is the tradeoff for greater control.
 
+
 ## 18. Future Improvements 🗺️
 
 This project already implements more than a minimal RAG demo, but there is still room to grow.
@@ -830,6 +844,7 @@ Some especially valuable next steps are:
 - Multi-tenant document collections
 
 Because the project already uses stable service boundaries and config-driven backends, those improvements can be added incrementally instead of requiring a full redesign.
+
 
 ## 19. Refactoring Path: LangChain, LlamaIndex, or Bedrock 🛣️
 
@@ -886,6 +901,7 @@ This is exactly why I prefer a modular monorepo for projects like this. The curr
 
 That flexibility makes the project more realistic from a software engineering perspective.
 
+
 ## 20. Conclusion 🧵
 
 This repository demonstrates that you can build a serious AI application without making OpenAI the centre of the architecture.
@@ -896,7 +912,8 @@ Local AI makes the most sense when you care about privacy, predictable cost, int
 
 For me, that is the biggest takeaway from building this project: the interesting part is not just calling a model. It is designing the full pipeline around retrieval quality, data ownership, extensibility, and real product constraints.
 
-## Demoing This Repo 🎬
+
+## 21. Demoing This Repo 🎬
 
 If you want to use this article together with a live demo, the shortest path is:
 
@@ -917,4 +934,3 @@ Then:
 2. Upload a PDF
 3. Ask a question that requires document retrieval
 4. Show that the answer includes sources
-
