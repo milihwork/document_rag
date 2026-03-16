@@ -31,7 +31,7 @@ This project is designed as a small AI platform rather than a single demo script
 
 ![Architecture diagram](docs/architecture.png)
 
-*[↑ Full Architecture section](#architecture)*
+*[↑ Full Architecture section](docs/architecture.md)*
 
 ## Why This Project Stands Out 🚀
 
