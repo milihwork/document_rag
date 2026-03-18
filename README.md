@@ -35,7 +35,7 @@ This project is designed as a small AI platform rather than a single demo script
 
 ## Why This Project Stands Out 🚀
 
-* Runs fully local by default with `sentence-transformers`, Qdrant, and `llama.cpp`
+* Runs fully local by default with **Hugging Face** (sentence-transformers), Qdrant, and `llama.cpp`
 * Implements a complete end-to-end RAG pipeline instead of simple prompt forwarding
 * Includes practical quality layers such as query rewriting, reranking, safeguards, and optional ML analysis
 * Uses a modular multi-service architecture with config-driven backends
@@ -85,7 +85,7 @@ For the full documentation map, see [docs/README.md](docs/README.md).
 ### Extensibility 🔌
 
 * Config-driven backends for embeddings, vector databases, and LLM providers
-* Default local stack with `sentence-transformers`, Qdrant, and `llama.cpp`
+* Default local stack with **Hugging Face** (sentence-transformers), Qdrant, and `llama.cpp`
 * Alternative and extensible backends including `pgvector`, `openai`, and Bedrock-oriented extension points
 
 ### Developer experience 💻
@@ -99,11 +99,11 @@ For the full documentation map, see [docs/README.md](docs/README.md).
 
 The default stack runs fully locally:
 
-| Component       | Technology                 |
-| --------------- | -------------------------- |
-| Embeddings      | `BAAI/bge-small-en-v1.5`   |
-| Vector Database | Qdrant                     |
-| LLM             | Mistral 7B via `llama.cpp` |
+| Component       | Technology                          |
+| --------------- | ----------------------------------- |
+| Embeddings      | **[Hugging Face](docs/huggingface.md)** (`BAAI/bge-small-en-v1.5`) |
+| Vector Database | Qdrant                              |
+| LLM             | Mistral 7B via `llama.cpp`          |
 
 No external API keys required.
 
@@ -303,8 +303,15 @@ The root `.env` is the recommended place to set values such as `LLM_URL`, `ML_SE
 | RERANKER_PROVIDER | bge (use `none` to disable) | Optional reranker; BGE cross-encoder |
 | VECTOR_SEARCH_TOP_K | 20                  | Candidates fetched when reranker enabled |
 | RERANK_TOP_K    | 3                      | Chunks passed to LLM after rerank |
-| EMBEDDING_MODEL | BAAI/bge-small-en-v1.5 | Embedding model            |
+| EMBEDDING_BACKEND | huggingface (alias: local) | Embedding backend; see [docs/huggingface.md](docs/huggingface.md) |
+| EMBEDDING_MODEL | BAAI/bge-small-en-v1.5 | Hugging Face model id (e.g. `author/repo`) |
+| EMBEDDING_NORMALIZE | true               | Normalize embeddings (recommended for cosine similarity) |
+| EMBEDDING_DEVICE | (unset)               | Optional device for embeddings (e.g. `cpu`, `cuda`) |
+| EMBEDDING_BATCH_SIZE | 32                | Batch size for embedding requests |
+| EMBEDDING_MAX_LENGTH | (unset)           | Optional truncation length for embedding model input |
 | CHUNK_SIZE      | 800                    | Chunk size                 |
+
+**Re-embedding note:** If you change `EMBEDDING_MODEL` or `EMBEDDING_NORMALIZE`, you must delete/version existing vectors and re-run ingestion. Also ensure the Retrieval service `VECTOR_SIZE` matches the embedding dimension.
 
 ---
 

@@ -94,7 +94,7 @@ flowchart LR
 
 | Area | Contract (stable) | Config key | Initial backend | Future backends (examples) |
 |------|-------------------|------------|------------------|----------------------------|
-| **Embedding** | `POST /embed` single or batch; same request/response shape | `EMBEDDING_BACKEND` | `local` (sentence-transformers) | `bedrock`, `openai`, `cohere` |
+| **Embedding** | `POST /embed` single or batch; same request/response shape | `EMBEDDING_BACKEND` | `local` (sentence-transformers / Hugging Face) | `bedrock`, `openai`, `cohere` |
 | **Vector store** | `POST /search`, `POST /upsert`, ensure collection; same chunk shape | `VECTOR_BACKEND` | `qdrant` | `pgvector`, `pinecone` |
 | **LLM** | Prompt in, text out (RAG calls one abstraction) | `LLM_BACKEND` | `llama` (llama.cpp HTTP) | `bedrock`, `openai`, `azure` |
 | **Reranker** | Query + documents → top_k ranked documents (in-process, optional) | `RERANKER_PROVIDER` | `bge` (BAAI/bge-reranker-base) | `none` to disable; future: other cross-encoders |
@@ -109,7 +109,7 @@ Each owning service (Embedding, Retrieval, RAG) loads the backend from config an
 |---------|----------------|----------|-------|
 | **Gateway** | Single entry for frontend; proxy to Ingestion and RAG | `POST /ingest`, `POST /chat`, `GET /health` | Ingestion, RAG |
 | **Ingestion** | PDF or text → chunks; embed via Embedding; store via Retrieval | `POST /ingest` (multipart file), `POST /ingest/text` (JSON body) → `{status, chunks_inserted, document}` | Embedding, Retrieval |
-| **Embedding** | Text → vectors; **backend** = local / Bedrock / OpenAI / etc. | `POST /embed` `{text}` or `{texts}` → `{embedding}` / `{embeddings}` (contract fixed) | — |
+| **Embedding** | Text → vectors; **backend** = huggingface (alias: local) / Bedrock / OpenAI / etc. | `POST /embed` `{text}` or `{texts}` → `{embedding}` / `{embeddings}` (contract fixed) | — |
 | **Retrieval** | Vector search + upsert; **backend** = Qdrant / pgvector / etc. | `POST /search` `{query_vector, top_k}` → `{chunks}`; `POST /upsert` `{points}`; ensure collection | Selected vector store |
 | **RAG** | Orchestrate: embed → search → (optional rerank) → prompt → LLM; **LLM backend** selectable; **reranker** optional; **safeguards** (input/output) configurable; **ML service** (optional) for injection detection and retrieval scoring | `POST /ask` `{question}` → `{question, answer, sources}` | Embedding, Retrieval, ML (optional), LLM (backend) |
 | **ML** | LLM-based analysis: injection detection, query classification, retrieval quality scoring; optional service called by RAG | `POST /analyze` `{query, chunks?}` → `{injection, intent, retrieval_score?}`; `POST /score` `{query, chunks}` → `{score, sufficient, reason}` | LLM (backend) |
@@ -135,7 +135,7 @@ Under `backend/`:
 | **`backend/services/ml/`** | FastAPI app; LLM-based analysis: **injection detection**, **query classification**, **retrieval scoring**. Uses same LLM backend as RAG. See [ml_service.md](ml_service.md). |
 | **`frontend/`** | Vite + React app; talks to Gateway only. |
 | **`mcp_service/`** | MCP server (FastMCP): tools that call Embedding, Retrieval, RAG, and Ingestion over HTTP. See [mcp.md](mcp.md). |
-| **`docs/`** | Documentation; [backends.md](backends.md) for adding new backends; [mcp.md](mcp.md) for the MCP server; [ml_service.md](ml_service.md) for the ML service; [query_rewriter.md](query_rewriter.md) for query rewriting. |
+| **`docs/`** | Documentation; [backends.md](backends.md) for adding new backends; [huggingface.md](huggingface.md) for the Hugging Face embedding backend; [mcp.md](mcp.md) for the MCP server; [ml_service.md](ml_service.md) for the ML service; [query_rewriter.md](query_rewriter.md) for query rewriting. |
 
 ---
 
@@ -145,10 +145,18 @@ Under `backend/`:
 |---------|------------------------|
 | **Gateway** | `INGESTION_URL`, `RAG_URL`, optional `PORT` (e.g. `http://ingestion:8001`, `http://rag:8004`). |
 | **Ingestion** | `EMBEDDING_URL`, `RETRIEVAL_URL`, `CHUNK_SIZE`. No backend keys. |
-| **Embedding** | `EMBEDDING_BACKEND=local` (default). Backend-specific: `local` → `EMBEDDING_MODEL` (e.g. `BAAI/bge-small-en-v1.5`); `bedrock` → AWS region, model ID, credentials; `openai` → API key, model. |
+| **Embedding** | `EMBEDDING_BACKEND=huggingface` (recommended; alias: `local`). Backend-specific: `huggingface`/`local` → `EMBEDDING_MODEL` (e.g. `BAAI/bge-small-en-v1.5`), `EMBEDDING_NORMALIZE=true` (default). See [huggingface.md](huggingface.md). `bedrock` → AWS region, model ID, credentials; `openai` → API key, model. |
 | **Retrieval** | `VECTOR_BACKEND=qdrant` (default). Backend-specific: `qdrant` → `QDRANT_HOST`, `QDRANT_PORT`, `COLLECTION_NAME`, `VECTOR_SIZE` (384), `TOP_K`; `pgvector` → `DATABASE_URL`, table name, vector size, top_k. |
 | **RAG** | `EMBEDDING_URL`, `RETRIEVAL_URL`, `LLM_BACKEND=llama` (default), `TOP_K`. **Safeguards:** `SAFEGUARD_ENABLED=true` (default; set to `false` to disable), `SAFEGUARD_PROVIDER=basic`. **Reranker (optional):** `RERANKER_PROVIDER=bge` (default; use `none` or empty to disable), `VECTOR_SEARCH_TOP_K=20`, `RERANK_TOP_K=3`. **Query Rewriter (optional):** `QUERY_REWRITING_ENABLED=true` (default; set to `false` to disable), `QUERY_REWRITER_PROVIDER=llm`, `QUERY_REWRITER_MAX_WORDS=10`; see [query_rewriter.md](query_rewriter.md). **ML Service (optional):** `ML_SERVICE_ENABLED=false` (default; set to `true` to enable), `ML_SERVICE_URL`, `INJECTION_THRESHOLD=0.7`, `RETRIEVAL_SCORE_THRESHOLD=0.5`. LLM backend-specific: `llama` → `LLM_URL`; `bedrock` → region, model ID, credentials; `openai` → API key, model. |
 | **ML** | `LLM_BACKEND=llama` (default), `LLM_URL`. Backend-specific: same as RAG. **Thresholds:** `INJECTION_THRESHOLD=0.7`, `RETRIEVAL_SCORE_THRESHOLD=0.5`. |
+
+### Re-embedding when you change embedding behavior
+
+If you change the embedding model (`EMBEDDING_MODEL`) or embedding normalization (`EMBEDDING_NORMALIZE`), you must **re-embed** stored vectors:
+
+- Delete or version your existing vector collection(s)
+- Re-run ingestion to regenerate vectors
+- Ensure the Retrieval service `VECTOR_SIZE` matches the embedding model’s vector dimension
 
 Each service has its own `config/settings.py` (or equivalent) loaded from env.
 

@@ -67,6 +67,7 @@ _langchain_import_error: str | None = None
 if settings.LANGCHAIN_ENABLED:
     try:
         from langchain_core.prompts import PromptTemplate  # noqa: F401
+
         from .langchain_adapters import (  # noqa: F401
             HttpVectorRetriever,
             RetrievalMapping,

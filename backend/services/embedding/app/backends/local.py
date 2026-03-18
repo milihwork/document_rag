@@ -1,4 +1,4 @@
-"""Local embedding backend using sentence-transformers."""
+"""Local embedding backend using sentence-transformers (Hugging Face)."""
 
 import logging
 from typing import Any
@@ -23,15 +23,34 @@ class LocalEmbeddingBackend(EmbeddingBackend):
             # Lazy import to avoid importing heavy deps at module import time.
             from sentence_transformers import SentenceTransformer
 
-            self._model = SentenceTransformer(settings.EMBEDDING_MODEL)
+            if settings.EMBEDDING_DEVICE:
+                self._model = SentenceTransformer(
+                    settings.EMBEDDING_MODEL, device=settings.EMBEDDING_DEVICE
+                )
+            else:
+                self._model = SentenceTransformer(settings.EMBEDDING_MODEL)
         return self._model
 
     def embed(self, text: str) -> list[float]:
         """Generate embedding for a single text."""
         model = self._get_model()
-        return model.encode(text).tolist()
+        return model.encode(
+            text,
+            normalize_embeddings=settings.EMBEDDING_NORMALIZE,
+        ).tolist()
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
         """Generate embeddings for multiple texts."""
         model = self._get_model()
-        return model.encode(texts).tolist()
+        kwargs: dict[str, Any] = {
+            "normalize_embeddings": settings.EMBEDDING_NORMALIZE,
+            "batch_size": settings.EMBEDDING_BATCH_SIZE,
+        }
+        if settings.EMBEDDING_MAX_LENGTH is not None:
+            kwargs["max_length"] = settings.EMBEDDING_MAX_LENGTH
+        return model.encode(texts, **kwargs).tolist()
+
+
+@register("huggingface")
+class HuggingFaceEmbeddingBackend(LocalEmbeddingBackend):
+    """Alias of the local sentence-transformers backend with explicit naming."""

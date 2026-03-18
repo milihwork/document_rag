@@ -6,6 +6,9 @@ def build_prompt(question: str, context: str) -> str:
     return f"""
 You are an AI assistant that answers questions strictly based on the provided context.
 
+Answer only the question asked below. Do not repeat, list, or include other
+questions and answers that appear in the context.
+
 Context:
 ----------------
 {context}

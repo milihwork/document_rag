@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - `backend/services/rag/requirements.txt`: add `langchain`, `langchain-core`, `langsmith`.
 - `.env.example`: add LangChain/LangSmith feature flags (`LANGCHAIN_ENABLED`, `MULTIQUERY_*`, `LANGCHAIN_RETRIEVER_TOP_K`, `LANGSMITH_TRACING`) and LangSmith env var hints.
+- Embedding service (local / sentence-transformers backend): enable embedding normalization by default and add runtime config knobs (`EMBEDDING_NORMALIZE`, optional `EMBEDDING_DEVICE`, `EMBEDDING_BATCH_SIZE`, `EMBEDDING_MAX_LENGTH`). Changing `EMBEDDING_MODEL` or `EMBEDDING_NORMALIZE` requires re-embedding stored vectors and ensuring Retrieval `VECTOR_SIZE` matches the embedding dimension.
+- Embedding backend naming: add **Hugging Face** as the default embedding backend; `EMBEDDING_BACKEND=huggingface` is an explicit alias of the sentence-transformers backend (previous `local` remains supported). Update `docker-compose.yml` and env examples to use `huggingface` for clarity.
 - Gateway: add dev-only `GET /debug/config` endpoint (allowlisted runtime config snapshot; disabled in production).
 - Frontend (dev-only): add **Environment details** button + modal (loads `GET /debug/config`, shows JSON, copy-to-clipboard).
 - `docs/local-development.md`: document the dev-only Environment details popup and optional LangChain path.
