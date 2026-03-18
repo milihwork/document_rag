@@ -72,6 +72,10 @@ services:
       dockerfile: services/rag/Dockerfile
     ports:
       - "8004:8004"
+    # Mount Hugging Face cache so the container can use the host's disk and reuse
+    # the BGE reranker model (~1.1 GB) already downloaded when running locally.
+    volumes:
+      - ${HF_HOME:-${HOME}/.cache/huggingface}:/root/.cache/huggingface
     environment:
       - EMBEDDING_URL=http://embedding:8002
       - RETRIEVAL_URL=http://retrieval:8003

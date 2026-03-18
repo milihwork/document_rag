@@ -7,8 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY shared/ shared/
 COPY services/ml/ services/ml/
-COPY services/rag/ services/rag/
-RUN touch /app/services/__init__.py
+RUN mkdir -p /app/services && touch /app/services/__init__.py
 
 ENV PYTHONPATH=/app
 EXPOSE 8005

@@ -12,6 +12,10 @@ COPY services/safeguard/ services/safeguard/
 # Ensure "services" is a proper package so "services.rag.app.main" resolves (same as local PYTHONPATH=backend)
 RUN mkdir -p /app/services && touch /app/services/__init__.py
 
+# Pre-download BGE reranker (~1.1 GB) so the container does not need to download at
+# runtime (avoids "no space left on device" when the container has limited disk).
+RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-base')"
+
 ENV PYTHONPATH=/app
 EXPOSE 8004
 
