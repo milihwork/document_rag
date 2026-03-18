@@ -117,6 +117,16 @@ app.get('/debug/config', async (_req: Request, res: Response) => {
     ingestionUrl: config.ingestionUrl,
     ragUrl: config.ragUrl,
     port: config.port,
+    // Embedding-related env vars are included for transparency in dev.
+    // Note: the Gateway itself does not use these values at runtime.
+    embedding: {
+      EMBEDDING_BACKEND: process.env.EMBEDDING_BACKEND,
+      EMBEDDING_MODEL: process.env.EMBEDDING_MODEL,
+      EMBEDDING_NORMALIZE: process.env.EMBEDDING_NORMALIZE,
+      EMBEDDING_DEVICE: process.env.EMBEDDING_DEVICE,
+      EMBEDDING_BATCH_SIZE: process.env.EMBEDDING_BATCH_SIZE,
+      EMBEDDING_MAX_LENGTH: process.env.EMBEDDING_MAX_LENGTH,
+    },
   };
 
   try {

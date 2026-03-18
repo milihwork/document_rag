@@ -96,7 +96,8 @@ Implementation: `backend/services/reranker/` (base, bge_reranker, factory). RAG 
 
 ## Env Summary ⚙️
 
-- **Embedding:** `EMBEDDING_BACKEND=local|bedrock|openai`; backend-specific vars per implementation.
+- **Embedding:** `EMBEDDING_BACKEND=huggingface|local|bedrock|openai`; backend-specific vars per implementation.
+  - Hugging Face (sentence-transformers): `EMBEDDING_MODEL`, `EMBEDDING_NORMALIZE` (default `true`), optional `EMBEDDING_DEVICE`, `EMBEDDING_BATCH_SIZE`, `EMBEDDING_MAX_LENGTH`. (`local` is an alias of `huggingface`.) See [Hugging Face (Embedding Backend)](huggingface.md) for full details.
 - **Retrieval:** `VECTOR_BACKEND=qdrant|pgvector`; backend-specific vars (e.g. `QDRANT_*` for qdrant; `DATABASE_URL`, `PGVECTOR_TABLE_NAME` for pgvector).
 - **RAG:** `LLM_BACKEND=llama|bedrock|openai`; **Reranker:** `RERANKER_PROVIDER=bge|none` (default `bge`); `VECTOR_SEARCH_TOP_K` (default 20), `RERANK_TOP_K` (default 3). LLM backend-specific vars (e.g. `LLM_URL` for llama, `OPENAI_API_KEY`/`OPENAI_MODEL` for openai, AWS vars for bedrock).
 

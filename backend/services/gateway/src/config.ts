@@ -1,6 +1,12 @@
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 
-dotenv.config();
+// Prefer the repo root `.env` so `make run-gateway` behaves like the Python services.
+// When compiled, __dirname points to `.../backend/services/gateway/dist`, so going up 4 levels
+// lands in `.../document_rag/`.
+const rootEnvPath = path.resolve(__dirname, '../../../..', '.env');
+dotenv.config({ path: fs.existsSync(rootEnvPath) ? rootEnvPath : undefined });
 
 const toBaseUrl = (value: string | undefined, fallback: string) =>
   (value ?? fallback).replace(/\/$/, '');

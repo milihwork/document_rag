@@ -17,7 +17,7 @@ services:
     ports:
       - "8002:8002"
     environment:
-      - EMBEDDING_BACKEND=local
+      - EMBEDDING_BACKEND=huggingface
       - EMBEDDING_MODEL=${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
 
   retrieval:
@@ -115,6 +115,13 @@ services:
       - RAG_URL=http://rag:8004
       # Enable /debug/config for Environment details UI (optional: set false in prod)
       - DEBUG_ENDPOINTS=${DEBUG_ENDPOINTS:-true}
+      # Expose embedding settings for /debug/config (dev transparency only)
+      - EMBEDDING_BACKEND=${EMBEDDING_BACKEND:-huggingface}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+      - EMBEDDING_NORMALIZE=${EMBEDDING_NORMALIZE:-true}
+      - EMBEDDING_DEVICE=${EMBEDDING_DEVICE:-}
+      - EMBEDDING_BATCH_SIZE=${EMBEDDING_BATCH_SIZE:-32}
+      - EMBEDDING_MAX_LENGTH=${EMBEDDING_MAX_LENGTH:-}
     depends_on:
       - ingestion
       - rag
