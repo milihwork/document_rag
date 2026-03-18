@@ -9,7 +9,7 @@ The repo uses **config-driven backends** for embeddings, vector store, and LLM. 
 | Embedding | `EMBEDDING_BACKEND` | `backend/services/embedding/` | `local` | New file in `app/backends/`, register, add env |
 | Vector store | `VECTOR_BACKEND` | `backend/services/retrieval/` | `qdrant` | New file in `app/backends/`, register, add env |
 | LLM | `LLM_BACKEND` | `backend/services/rag/` | `llama` | New file in `app/backends/`, register, add env |
-| Reranker | `RERANKER_PROVIDER` | RAG uses `backend/services/reranker/` | `bge` | New file in `services/reranker/`, register in factory; `none` to disable |
+| Reranker | `RERANKER_PROVIDER` | RAG uses `backend/shared/reranker/` | `bge` | New file in `shared/reranker/`, register in factory; `none` to disable |
 
 ---
 
@@ -86,11 +86,11 @@ Implementation: `backend/services/rag/app/backends/openai_backend.py`. The Gatew
 
 **To add another reranker backend:**
 
-1. In `backend/services/reranker/`, add e.g. `my_reranker.py`. Implement a class with a `rerank(query, documents, top_k)` method (see `base.py` and `bge_reranker.py`).
-2. In `factory.py`, import the new module and add a branch for the new provider name (e.g. `if provider == "my_reranker": return MyReranker()`).
+1. In `backend/shared/reranker/`, add e.g. `my_reranker.py`. Implement a class with a `rerank(query, documents, top_k)` method (see `base.py` and `bge_reranker.py`).
+2. In `shared/reranker/factory.py`, import the new module and add a branch for the new provider name (e.g. `if provider == "my_reranker": return MyReranker()`).
 3. Document backend-specific env. Use `RERANKER_PROVIDER=my_reranker` to select it.
 
-Implementation: `backend/services/reranker/` (base, bge_reranker, factory). RAG imports `get_reranker()` when reranker is enabled.
+Implementation: `backend/shared/reranker/` (base, bge_reranker, factory). RAG imports `get_reranker()` when reranker is enabled.
 
 ---
 

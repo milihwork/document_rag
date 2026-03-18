@@ -1,6 +1,7 @@
 fastapi
 uvicorn[standard]
 sentence-transformers>=3.0,<4.0
+# Pinned <2 for sentence-transformers/PyTorch; see README Troubleshooting for NumPy 2 upgrade path.
 numpy>=1.24,<2
 pydantic
 pypdf

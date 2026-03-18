@@ -342,6 +342,8 @@ cd frontend && npm run build
 
 **NumPy/PyTorch:** If the API fails to start with a NumPy/PyTorch compatibility error (e.g. "A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x"), reinstall dependencies with the venv activated: `pip install -r requirements.txt`. The project pins `numpy>=1.24,<2` for compatibility with PyTorch and sentence-transformers.
 
+**NumPy 2.x upgrade path:** The project currently pins NumPy to `<2` for compatibility with sentence-transformers and PyTorch. When those dependencies support NumPy 2.x, you can upgrade by: (1) updating the `numpy` constraint to `numpy>=2` (or removing the upper bound) in all backend requirement files that reference it (`backend/requirements.txt`, `backend/services/embedding/requirements.txt`, `backend/services/retrieval/requirements.txt`); (2) running `make test` and manual smoke tests (embedding, reranker, RAG) to confirm nothing breaks. See each dependency’s release notes for compatibility status.
+
 ---
 
 # Project Structure 🗂️

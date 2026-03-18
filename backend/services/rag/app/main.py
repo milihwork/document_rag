@@ -142,6 +142,21 @@ async def _search(query_vector: list[float], top_k: int | None = None) -> list[d
         return (r.json())[KEY_CHUNKS]
 
 
+def _rerank_chunks(question: str, chunks: list[dict], top_k: int | None = None) -> list[dict]:
+    """Run reranker on chunk texts and return chunks in reranked order. Uses KEY_TEXT/KEY_SOURCE."""
+    if not chunks:
+        return []
+    doc_texts = [c[KEY_TEXT] for c in chunks]
+    k = top_k if top_k is not None else settings.RERANK_TOP_K
+    top_texts = get_reranker().rerank(question, doc_texts, top_k=k)
+    text_to_chunk = {}
+    for c in chunks:
+        t = c[KEY_TEXT]
+        if t not in text_to_chunk:
+            text_to_chunk[t] = c
+    return [text_to_chunk[t] for t in top_texts if t in text_to_chunk]
+
+
 @traceable(name="rag.langchain_retrieve")
 async def _langchain_retrieve(question: str, retrieval_query: str) -> list[dict]:
     """Retrieve chunks using LangChain multi-query (feature flagged)."""
@@ -230,18 +245,7 @@ async def _langchain_retrieve(question: str, retrieval_query: str) -> list[dict]
     if not reranker_enabled or not chunks:
         return chunks[: settings.RERANK_TOP_K]
 
-    doc_texts = [c[KEY_TEXT] for c in chunks]
-    top_texts = get_reranker().rerank(
-        question,
-        doc_texts,
-        top_k=settings.RERANK_TOP_K,
-    )
-    text_to_chunk = {}
-    for c in chunks:
-        t = c[KEY_TEXT]
-        if t not in text_to_chunk:
-            text_to_chunk[t] = c
-    return [text_to_chunk[t] for t in top_texts if t in text_to_chunk]
+    return _rerank_chunks(question, chunks, settings.RERANK_TOP_K)
 
 
 async def _analyze_query(query: str) -> dict:
@@ -355,19 +359,7 @@ async def ask(request: AskRequest):
                 chunks = await _search(
                     query_embedding, top_k=settings.VECTOR_SEARCH_TOP_K
                 )
-                doc_texts = [c[KEY_TEXT] for c in chunks]
-                top_texts = get_reranker().rerank(
-                    request.question,
-                    doc_texts,
-                    top_k=settings.RERANK_TOP_K,
-                )
-                # Map reranked texts back to chunks (preserve order and source)
-                text_to_chunk = {}
-                for c in chunks:
-                    t = c[KEY_TEXT]
-                    if t not in text_to_chunk:
-                        text_to_chunk[t] = c
-                chunks = [text_to_chunk[t] for t in top_texts if t in text_to_chunk]
+                chunks = _rerank_chunks(request.question, chunks, settings.RERANK_TOP_K)
             else:
                 chunks = await _search(
                     query_embedding, top_k=settings.RERANK_TOP_K

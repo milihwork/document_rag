@@ -6,5 +6,6 @@ pypdf
 python-dotenv
 psycopg2-binary
 pgvector
-numpy
+# Pinned <2 for sentence-transformers/PyTorch; see README Troubleshooting for NumPy 2 upgrade path.
+numpy>=1.24,<2
 sentence-transformers>=3.0,<4.0
