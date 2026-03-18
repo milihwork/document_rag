@@ -253,8 +253,8 @@ export default function App() {
       <header>
         <h1>Document RAG</h1>
         <div className="headerRight">
-          <HealthIndicator />
           <EnvDetailsButton />
+          <HealthIndicator />
         </div>
       </header>
       <main>
