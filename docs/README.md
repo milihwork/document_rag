@@ -21,6 +21,7 @@ Use this page as the navigation hub for the repository documentation.
 
 - [ML service](ml_service.md) — injection detection, query classification, retrieval scoring, and document classification
 - [Query rewriter](query_rewriter.md) — rewrite short or vague queries before retrieval
+- [LangChain + LangSmith](langchain.md) — optional multi-query retrieval and tracing (RAG service only)
 - [Safeguards](safeguards.md) — input and output policy checks
 
 ## Demo and Article 🎬

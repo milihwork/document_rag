@@ -11,3 +11,8 @@ pydantic
 python-multipart
 pytest
 pytest-asyncio
+
+# Optional (used when RAG service feature flag LANGCHAIN_ENABLED=true)
+langchain
+langchain-core
+langsmith

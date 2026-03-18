@@ -103,6 +103,36 @@ app.post(
   },
 );
 
+app.get('/debug/config', async (_req: Request, res: Response) => {
+  // Dev-only endpoint unless DEBUG_ENDPOINTS=true (e.g. local Docker).
+  const debugEnabled =
+    process.env.DEBUG_ENDPOINTS === 'true' ||
+    process.env.DEBUG_ENDPOINTS === '1' ||
+    process.env.NODE_ENV !== 'production';
+  if (!debugEnabled) {
+    return res.status(404).json({ detail: 'Not found' });
+  }
+
+  const gateway = {
+    ingestionUrl: config.ingestionUrl,
+    ragUrl: config.ragUrl,
+    port: config.port,
+  };
+
+  try {
+    const upstream = await axios.get(`${config.ragUrl}/config`, { timeout: 5000 });
+    return res.json({ gateway, rag: upstream.data });
+  } catch (error) {
+    const detail =
+      error instanceof AxiosError
+        ? [error.code, error.message].filter(Boolean).join(' ') || error.message
+        : error instanceof Error
+          ? error.message
+          : String(error);
+    return res.json({ gateway, rag_error: detail || 'Failed to fetch RAG /config' });
+  }
+});
+
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });

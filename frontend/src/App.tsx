@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { getHealth, ingestPdf, chat } from './api'
+import { useEffect, useMemo, useState } from 'react'
+import { getHealth, ingestPdf, chat, getDebugConfig, type DebugConfigResponse } from './api'
 import './App.css'
 
 function HealthIndicator() {
@@ -26,6 +26,106 @@ function HealthIndicator() {
     <div className="health" data-status={status}>
       Backend: {status === 'checking' ? '…' : status === 'ok' ? 'OK' : 'Offline'}
     </div>
+  )
+}
+
+function EnvDetailsButton() {
+  const enabled = import.meta.env.DEV
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [data, setData] = useState<DebugConfigResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const prettyJson = useMemo(() => {
+    return data ? JSON.stringify(data, null, 2) : ''
+  }, [data])
+
+  const load = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await getDebugConfig()
+      setData(res)
+    } catch (e) {
+      setData(null)
+      setError(e instanceof Error ? e.message : 'Failed to load config')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!enabled) return null
+
+  return (
+    <>
+      <button
+        className="envButton"
+        type="button"
+        onClick={async () => {
+          setOpen(true)
+          await load()
+        }}
+      >
+        Environment details
+      </button>
+
+      {open && (
+        <div
+          className="modalOverlay"
+          role="presentation"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Environment details"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modalHeader">
+              <h2>Environment details (dev only)</h2>
+              <div className="modalActions">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!prettyJson) return
+                    await navigator.clipboard.writeText(prettyJson)
+                  }}
+                  disabled={!prettyJson}
+                >
+                  Copy JSON
+                </button>
+                <button type="button" onClick={() => setOpen(false)}>
+                  Close
+                </button>
+              </div>
+            </div>
+
+            <p className="modalHint">
+              This view is allowlisted and secrets are omitted.
+            </p>
+
+            {loading && <p className="result">Loading…</p>}
+            {error && <p className="result error">{error}</p>}
+
+            {data && (
+              <>
+                {data.rag_error && (
+                  <p className="result error">RAG config error: {data.rag_error}</p>
+                )}
+                <pre className="code">{prettyJson}</pre>
+              </>
+            )}
+
+            <div className="modalFooter">
+              <button type="button" onClick={load} disabled={loading}>
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
@@ -152,7 +252,10 @@ export default function App() {
     <div className="app">
       <header>
         <h1>Document RAG</h1>
-        <HealthIndicator />
+        <div className="headerRight">
+          <HealthIndicator />
+          <EnvDetailsButton />
+        </div>
       </header>
       <main>
         <IngestSection />

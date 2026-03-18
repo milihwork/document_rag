@@ -106,5 +106,39 @@ export const openApiSpec = {
         },
       },
     },
+    '/debug/config': {
+      get: {
+        summary: 'Debug config (dev only)',
+        description:
+          'Returns an allowlisted runtime configuration snapshot aggregated from the Gateway and RAG services. Dev-only: returns 404 when NODE_ENV=production.',
+        responses: {
+          '200': {
+            description: 'Gateway and RAG config snapshot',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['gateway'],
+                  properties: {
+                    gateway: {
+                      type: 'object',
+                      required: ['ingestionUrl', 'ragUrl', 'port'],
+                      properties: {
+                        ingestionUrl: { type: 'string', example: 'http://127.0.0.1:8001' },
+                        ragUrl: { type: 'string', example: 'http://127.0.0.1:8004' },
+                        port: { type: 'number', example: 8000 },
+                      },
+                    },
+                    rag: { type: 'object', additionalProperties: true },
+                    rag_error: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          '404': { description: 'Not available in production' },
+        },
+      },
+    },
   },
 } as const;

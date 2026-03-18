@@ -18,6 +18,12 @@ header h1 {
   font-size: 1.5rem;
 }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .health {
   font-size: 0.875rem;
 }
@@ -76,6 +82,115 @@ header h1 {
 }
 
 .row button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.envButton {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #333;
+  border-radius: 999px;
+  background: transparent;
+  color: #333;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.envButton:hover {
+  background: #f3f3f3;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 1rem 2rem;
+  z-index: 1;
+}
+
+.modal {
+  width: min(900px, 100%);
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  padding: 1rem;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modalActions button {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+.modalActions button:hover:not(:disabled) {
+  background: #555;
+}
+
+.modalActions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modalHint {
+  margin: 0.5rem 0 0.75rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.code {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fafafa;
+  overflow: auto;
+  max-height: 60vh;
+  font-size: 0.85rem;
+}
+
+.modalFooter {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modalFooter button {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.modalFooter button:hover:not(:disabled) {
+  background: #f3f3f3;
+}
+
+.modalFooter button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

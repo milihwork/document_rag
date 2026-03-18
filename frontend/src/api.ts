@@ -49,3 +49,15 @@ export async function chat(question: string): Promise<ChatResponse> {
   }
   return res.json();
 }
+
+export type DebugConfigResponse = {
+  gateway: { ingestionUrl: string; ragUrl: string; port: number };
+  rag?: Record<string, unknown>;
+  rag_error?: string;
+};
+
+export async function getDebugConfig(): Promise<DebugConfigResponse> {
+  const res = await fetch(`${baseUrl || '/api'}/debug/config`);
+  if (!res.ok) throw new Error('Failed to load debug config');
+  return res.json();
+}

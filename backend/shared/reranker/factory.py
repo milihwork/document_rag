@@ -2,8 +2,6 @@
 
 import os
 
-from .bge_reranker import BGEReranker
-
 _reranker_instance = None
 
 
@@ -13,6 +11,10 @@ def get_reranker():
     if _reranker_instance is None:
         provider = (os.getenv("RERANKER_PROVIDER", "bge") or "").strip().lower()
         if provider == "bge":
+            # Lazy import so importing shared modules doesn't pull in heavy deps
+            # (sentence-transformers, torch, numpy) unless the reranker is used.
+            from .bge_reranker import BGEReranker
+
             _reranker_instance = BGEReranker()
         else:
             raise ValueError(

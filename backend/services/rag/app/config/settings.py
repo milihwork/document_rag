@@ -54,5 +54,24 @@ class Settings:
     )
     QUERY_REWRITER_MAX_WORDS: int = int(os.getenv("QUERY_REWRITER_MAX_WORDS", "10"))
 
+    # LangChain (optional): feature-flagged orchestration enhancements
+    LANGCHAIN_ENABLED: bool = (
+        os.getenv("LANGCHAIN_ENABLED", "false").strip().lower() in ("true", "1", "yes")
+    )
+    MULTIQUERY_ENABLED: bool = (
+        os.getenv("MULTIQUERY_ENABLED", "true").strip().lower() in ("true", "1", "yes")
+    )
+    MULTIQUERY_N: int = int(os.getenv("MULTIQUERY_N", "4"))
+    # Candidate depth for LangChain retrieval (pre-rerank). Defaults to VECTOR_SEARCH_TOP_K.
+    LANGCHAIN_RETRIEVER_TOP_K: int = int(
+        os.getenv("LANGCHAIN_RETRIEVER_TOP_K", str(int(os.getenv("VECTOR_SEARCH_TOP_K", "20"))))
+    )
+
+    # LangSmith tracing (optional). LangChain primarily uses LANGCHAIN_* env vars, but we
+    # also support a simple boolean to make it easy to toggle in this repo.
+    LANGSMITH_TRACING: bool = (
+        os.getenv("LANGSMITH_TRACING", "false").strip().lower() in ("true", "1", "yes")
+    )
+
 
 settings = Settings()

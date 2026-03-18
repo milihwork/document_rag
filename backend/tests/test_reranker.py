@@ -4,9 +4,6 @@ import os
 
 import pytest
 
-# Skip entire module if sentence_transformers not available or broken
-pytest.importorskip("sentence_transformers")
-
 from shared.reranker.bge_reranker import BGEReranker
 from shared.reranker.factory import get_reranker
 
@@ -17,7 +14,23 @@ def test_factory_returns_bge_reranker_by_default():
 
     factory_module._reranker_instance = None
     try:
-        reranker = get_reranker()
+        # Avoid loading sentence-transformers in tests.
+        class FakeModel:
+            def predict(self, pairs):
+                # Higher score for docs containing 'Python'
+                return [1.0 if "Python" in doc else 0.0 for _q, doc in pairs]
+
+        def fake_init(self):
+            self.model = FakeModel()
+
+        import shared.reranker.bge_reranker as bge_module
+
+        orig_init = bge_module.BGEReranker.__init__
+        bge_module.BGEReranker.__init__ = fake_init  # type: ignore[method-assign]
+        try:
+            reranker = get_reranker()
+        finally:
+            bge_module.BGEReranker.__init__ = orig_init  # type: ignore[method-assign]
         assert isinstance(reranker, BGEReranker)
     finally:
         factory_module._reranker_instance = None
@@ -43,7 +56,12 @@ def test_factory_raises_for_unknown_provider():
 
 def test_bge_reranker_returns_top_k():
     """BGEReranker.rerank returns a list of length top_k from the input documents."""
-    reranker = BGEReranker()
+    class FakeModel:
+        def predict(self, pairs):
+            return [1.0 if "Python" in doc else 0.0 for _q, doc in pairs]
+
+    reranker = BGEReranker.__new__(BGEReranker)
+    reranker.model = FakeModel()
     documents = [
         "The quick brown fox jumps over the lazy dog.",
         "Python is a programming language.",
@@ -58,14 +76,20 @@ def test_bge_reranker_returns_top_k():
 
 def test_bge_reranker_empty_documents():
     """BGEReranker.rerank with empty list returns empty list."""
-    reranker = BGEReranker()
+    reranker = BGEReranker.__new__(BGEReranker)
+    reranker.model = object()
     result = reranker.rerank("query", [], top_k=3)
     assert result == []
 
 
 def test_bge_reranker_top_k_larger_than_docs():
     """When top_k exceeds document count, returns all documents."""
-    reranker = BGEReranker()
+    class FakeModel:
+        def predict(self, pairs):
+            return list(range(len(pairs)))
+
+    reranker = BGEReranker.__new__(BGEReranker)
+    reranker.model = FakeModel()
     documents = ["First.", "Second."]
     result = reranker.rerank("query", documents, top_k=10)
     assert len(result) == 2

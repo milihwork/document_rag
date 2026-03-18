@@ -1,8 +1,7 @@
 """Local embedding backend using sentence-transformers."""
 
 import logging
-
-from sentence_transformers import SentenceTransformer
+from typing import Any
 
 from ..config.settings import settings
 from . import register
@@ -16,11 +15,14 @@ class LocalEmbeddingBackend(EmbeddingBackend):
     """Generate embeddings with a local sentence-transformers model."""
 
     def __init__(self):
-        self._model: SentenceTransformer | None = None
+        self._model: Any | None = None
 
-    def _get_model(self) -> SentenceTransformer:
+    def _get_model(self):
         if self._model is None:
             logger.info("Loading embedding model: %s", settings.EMBEDDING_MODEL)
+            # Lazy import to avoid importing heavy deps at module import time.
+            from sentence_transformers import SentenceTransformer
+
             self._model = SentenceTransformer(settings.EMBEDDING_MODEL)
         return self._model
 

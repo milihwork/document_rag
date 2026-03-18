@@ -32,6 +32,8 @@ source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+Note: the RAG service has an optional LangChain retrieval path controlled by `LANGCHAIN_ENABLED`. If you plan to enable it, ensure your environment includes the LangChain dependencies (they are included in `backend/requirements.txt`).
+
 Optional: copy and edit the repo-wide env file if you want to override defaults (for example if your LLM is not on `http://localhost:8080`):
 
 ```bash
@@ -41,6 +43,13 @@ cp .env.example .env
 The Python backend services load the root `.env`, so this is the recommended place to set values such as `LLM_URL`, `ML_SERVICE_ENABLED`, `SAFEGUARD_ENABLED`, and retrieval settings. The file `backend/.env.example` is kept as a backend-focused reference, but the root `.env` is the primary config file for this repository.
 
 Defaults already point to `http://localhost:8001`–`8004` for the four Python services plus the Gateway and `localhost:6333` for Qdrant, so no extra env is required for local inter-service URLs.
+
+### Dev-only: Environment details popup 🧾
+
+In local development, the UI includes an **Environment details** button (dev-only). It fetches a safe, allowlisted runtime config snapshot from the Gateway (`GET /debug/config`) and displays it in a popup.
+
+- Secrets are **omitted** from the response.
+- The endpoint is **disabled in production** (returns 404 when `NODE_ENV=production`).
 
 ### 3. Gateway Node.js environment 🌉
 

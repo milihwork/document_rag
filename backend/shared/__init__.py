@@ -36,7 +36,6 @@ from shared.contracts import (
 )
 from shared.pdf_parser import extract_text
 from shared.prompt_builder import build_prompt
-from shared.reranker import BaseReranker, get_reranker
 
 __all__ = [
     "chunk_text",
@@ -73,6 +72,4 @@ __all__ = [
     "PATH_SEARCH",
     "PATH_UPSERT",
     "SOURCE_UNKNOWN",
-    "BaseReranker",
-    "get_reranker",
 ]

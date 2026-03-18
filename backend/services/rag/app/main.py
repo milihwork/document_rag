@@ -1,6 +1,7 @@
 """RAG service: POST /ask — embed query, search, build prompt, call LLM, return answer + sources."""
 
 import logging
+import os
 import time
 
 import httpx
@@ -41,11 +42,44 @@ from shared.reranker import get_reranker
 from .backends import get_backend
 from .config.settings import settings
 
+if settings.LANGSMITH_TRACING:
+    # LangChain tracing is primarily controlled via LANGCHAIN_TRACING_V2=true.
+    # We allow this repo-level toggle to enable tracing without forcing a specific provider.
+    os.environ.setdefault("LANGCHAIN_TRACING_V2", "true")
+
+try:
+    from langsmith import traceable  # type: ignore
+except Exception:  # pragma: no cover
+    def traceable(*_args, **_kwargs):  # type: ignore
+        def _decorator(fn):
+            return fn
+
+        return _decorator
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+# If LANGCHAIN_ENABLED, validate imports at startup so we fail fast with a clear error.
+_langchain_import_error: str | None = None
+if settings.LANGCHAIN_ENABLED:
+    try:
+        from .langchain_adapters import (  # noqa: F401
+            HttpVectorRetriever,
+            RetrievalMapping,
+            dedupe_documents,
+        )
+        from langchain_core.prompts import PromptTemplate  # noqa: F401
+    except (ImportError, ModuleNotFoundError) as e:
+        _langchain_import_error = str(e)
+        logger.error(
+            "LangChain is enabled but imports failed: %s. "
+            "Install RAG dependencies (e.g. pip install -r backend/requirements.txt) or set LANGCHAIN_ENABLED=false.",
+            _langchain_import_error,
+            exc_info=True,
+        )
 
 app = FastAPI(
     title="RAG Orchestration Service",
@@ -106,6 +140,108 @@ async def _search(query_vector: list[float], top_k: int | None = None) -> list[d
         return (r.json())[KEY_CHUNKS]
 
 
+@traceable(name="rag.langchain_retrieve")
+async def _langchain_retrieve(question: str, retrieval_query: str) -> list[dict]:
+    """Retrieve chunks using LangChain multi-query (feature flagged)."""
+
+    if _langchain_import_error:
+        raise NotImplementedError(
+            f"LangChain is not available: {_langchain_import_error}. "
+            "Install RAG service dependencies or disable LANGCHAIN_ENABLED."
+        )
+
+    try:
+        from .langchain_adapters import (
+            HttpVectorRetriever,
+            RetrievalMapping,
+            dedupe_documents,
+        )
+    except (ImportError, ModuleNotFoundError) as e:  # pragma: no cover
+        raise NotImplementedError(
+            f"LangChain is not available: {e!s}. "
+            "Install RAG service dependencies or disable LANGCHAIN_ENABLED."
+        ) from e
+
+    reranker_enabled = settings.RERANKER_PROVIDER not in ("", "none")
+    candidate_top_k = (
+        settings.LANGCHAIN_RETRIEVER_TOP_K
+        if reranker_enabled
+        else settings.RERANK_TOP_K
+    )
+
+    retriever = HttpVectorRetriever(
+        embed=_embed,
+        search=_search,
+        top_k=candidate_top_k,
+        mapping=RetrievalMapping(text_key=KEY_TEXT, source_key=KEY_SOURCE, score_key=KEY_SCORE),
+    )
+
+    try:
+        from langchain_core.prompts import PromptTemplate
+    except (ImportError, ModuleNotFoundError) as e:  # pragma: no cover
+        raise NotImplementedError(
+            f"LangChain is not available: {e!s}. "
+            "Install RAG service dependencies or disable LANGCHAIN_ENABLED."
+        ) from e
+
+    docs = []
+    if settings.MULTIQUERY_ENABLED:
+        n = max(1, int(settings.MULTIQUERY_N))
+        prompt_tpl = (
+            "You are a search query generator.\n"
+            f"Given the user question, write {n} different search queries that could "
+            "retrieve relevant passages.\n"
+            "Return one query per line, no numbering, no extra text.\n\n"
+            "Question: {question}\n"
+        )
+        prompt = PromptTemplate(
+            input_variables=["question"],
+            template=prompt_tpl,
+        )
+        gen_prompt = prompt.format(question=retrieval_query)
+        llm = _get_llm()
+        raw = llm.complete(gen_prompt)
+        queries = [s.strip() for s in raw.strip().splitlines() if s.strip()]
+        if retrieval_query.strip() not in queries:
+            queries.insert(0, retrieval_query)
+        all_docs = []
+        for q in queries[: n + 1]:
+            # LangChain 1.x retrievers use Runnable interface (ainvoke).
+            part = await retriever.ainvoke(q)
+            all_docs.extend(part)
+        docs = dedupe_documents(all_docs)
+    else:
+        docs = await retriever.ainvoke(retrieval_query)
+
+    docs = dedupe_documents(docs)
+
+    # Convert docs back to the service's chunk format.
+    chunks = [
+        {
+            KEY_TEXT: d.page_content,
+            KEY_SOURCE: d.metadata.get(KEY_SOURCE, d.metadata.get("source", "unknown")),
+        }
+        for d in docs
+        if d.page_content
+    ]
+
+    if not reranker_enabled or not chunks:
+        return chunks[: settings.RERANK_TOP_K]
+
+    doc_texts = [c[KEY_TEXT] for c in chunks]
+    top_texts = get_reranker().rerank(
+        question,
+        doc_texts,
+        top_k=settings.RERANK_TOP_K,
+    )
+    text_to_chunk = {}
+    for c in chunks:
+        t = c[KEY_TEXT]
+        if t not in text_to_chunk:
+            text_to_chunk[t] = c
+    return [text_to_chunk[t] for t in top_texts if t in text_to_chunk]
+
+
 async def _analyze_query(query: str) -> dict:
     """Call ML service for injection detection and query classification."""
     async with httpx.AsyncClient(timeout=30.0) as client:
@@ -148,6 +284,7 @@ def root():
 
 
 @app.post(PATH_ASK)
+@traceable(name="rag.ask")
 async def ask(request: AskRequest):
     """Run RAG: embed question -> search -> prompt -> LLM -> {question, answer, sources}."""
     start = time.perf_counter()
@@ -206,30 +343,33 @@ async def ask(request: AskRequest):
                 logger.warning("Query rewriting failed, using original: %s", e)
                 retrieval_query = request.question
 
-        query_embedding = await _embed(retrieval_query)
-
-        reranker_enabled = settings.RERANKER_PROVIDER not in ("", "none")
-        if reranker_enabled:
-            chunks = await _search(
-                query_embedding, top_k=settings.VECTOR_SEARCH_TOP_K
-            )
-            doc_texts = [c[KEY_TEXT] for c in chunks]
-            top_texts = get_reranker().rerank(
-                request.question,
-                doc_texts,
-                top_k=settings.RERANK_TOP_K,
-            )
-            # Map reranked texts back to chunks (preserve order and source)
-            text_to_chunk = {}
-            for c in chunks:
-                t = c[KEY_TEXT]
-                if t not in text_to_chunk:
-                    text_to_chunk[t] = c
-            chunks = [text_to_chunk[t] for t in top_texts if t in text_to_chunk]
+        if settings.LANGCHAIN_ENABLED:
+            chunks = await _langchain_retrieve(request.question, retrieval_query)
         else:
-            chunks = await _search(
-                query_embedding, top_k=settings.RERANK_TOP_K
-            )
+            query_embedding = await _embed(retrieval_query)
+
+            reranker_enabled = settings.RERANKER_PROVIDER not in ("", "none")
+            if reranker_enabled:
+                chunks = await _search(
+                    query_embedding, top_k=settings.VECTOR_SEARCH_TOP_K
+                )
+                doc_texts = [c[KEY_TEXT] for c in chunks]
+                top_texts = get_reranker().rerank(
+                    request.question,
+                    doc_texts,
+                    top_k=settings.RERANK_TOP_K,
+                )
+                # Map reranked texts back to chunks (preserve order and source)
+                text_to_chunk = {}
+                for c in chunks:
+                    t = c[KEY_TEXT]
+                    if t not in text_to_chunk:
+                        text_to_chunk[t] = c
+                chunks = [text_to_chunk[t] for t in top_texts if t in text_to_chunk]
+            else:
+                chunks = await _search(
+                    query_embedding, top_k=settings.RERANK_TOP_K
+                )
 
         # ML Service: score retrieval quality after reranking
         if settings.ML_SERVICE_ENABLED and chunks:
@@ -288,3 +428,38 @@ async def ask(request: AskRequest):
 @app.get(PATH_HEALTH)
 def health():
     return {KEY_STATUS: KEY_OK}
+
+
+@app.get("/config")
+def config():
+    """Return a non-secret, allowlisted runtime config snapshot."""
+
+    return {
+        # Core wiring (non-secret)
+        "EMBEDDING_URL": settings.EMBEDDING_URL,
+        "RETRIEVAL_URL": settings.RETRIEVAL_URL,
+        "LLM_BACKEND": settings.LLM_BACKEND,
+        "LLM_URL": settings.LLM_URL,
+        # Retrieval quality knobs
+        "TOP_K": settings.TOP_K,
+        "RERANKER_PROVIDER": settings.RERANKER_PROVIDER,
+        "VECTOR_SEARCH_TOP_K": settings.VECTOR_SEARCH_TOP_K,
+        "RERANK_TOP_K": settings.RERANK_TOP_K,
+        # Safeguards + ML
+        "SAFEGUARD_ENABLED": settings.SAFEGUARD_ENABLED,
+        "SAFEGUARD_PROVIDER": settings.SAFEGUARD_PROVIDER,
+        "ML_SERVICE_ENABLED": settings.ML_SERVICE_ENABLED,
+        "ML_SERVICE_URL": settings.ML_SERVICE_URL,
+        "INJECTION_THRESHOLD": settings.INJECTION_THRESHOLD,
+        "RETRIEVAL_SCORE_THRESHOLD": settings.RETRIEVAL_SCORE_THRESHOLD,
+        # Query rewriting
+        "QUERY_REWRITING_ENABLED": settings.QUERY_REWRITING_ENABLED,
+        "QUERY_REWRITER_PROVIDER": settings.QUERY_REWRITER_PROVIDER,
+        "QUERY_REWRITER_MAX_WORDS": settings.QUERY_REWRITER_MAX_WORDS,
+        # LangChain/LangSmith (non-secret flags only)
+        "LANGCHAIN_ENABLED": settings.LANGCHAIN_ENABLED,
+        "MULTIQUERY_ENABLED": settings.MULTIQUERY_ENABLED,
+        "MULTIQUERY_N": settings.MULTIQUERY_N,
+        "LANGCHAIN_RETRIEVER_TOP_K": settings.LANGCHAIN_RETRIEVER_TOP_K,
+        "LANGSMITH_TRACING": settings.LANGSMITH_TRACING,
+    }

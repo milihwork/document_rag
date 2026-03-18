@@ -2,8 +2,6 @@
 
 import logging
 
-from sentence_transformers import CrossEncoder
-
 from .base import BaseReranker
 
 logger = logging.getLogger(__name__)
@@ -14,6 +12,9 @@ class BGEReranker(BaseReranker):
 
     def __init__(self):
         logger.info("Loading BGE reranker model: BAAI/bge-reranker-base")
+        # Lazy import to avoid importing heavy deps at module import time.
+        from sentence_transformers import CrossEncoder
+
         self.model = CrossEncoder("BAAI/bge-reranker-base")
 
     def rerank(self, query: str, documents: list[str], top_k: int = 3) -> list[str]:

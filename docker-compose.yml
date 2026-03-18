@@ -87,6 +87,16 @@ services:
       - ML_SERVICE_URL=http://ml:8005
       - INJECTION_THRESHOLD=${INJECTION_THRESHOLD:-0.7}
       - RETRIEVAL_SCORE_THRESHOLD=${RETRIEVAL_SCORE_THRESHOLD:-0.5}
+      # Optional LangChain orchestration (defaults OFF)
+      - LANGCHAIN_ENABLED=${LANGCHAIN_ENABLED:-false}
+      - MULTIQUERY_ENABLED=${MULTIQUERY_ENABLED:-true}
+      - MULTIQUERY_N=${MULTIQUERY_N:-4}
+      - LANGCHAIN_RETRIEVER_TOP_K=${LANGCHAIN_RETRIEVER_TOP_K:-20}
+      # Optional LangSmith tracing (defaults OFF)
+      - LANGSMITH_TRACING=${LANGSMITH_TRACING:-false}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY:-}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT:-}
+      - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT:-}
     depends_on:
       - embedding
       - retrieval
@@ -103,6 +113,8 @@ services:
     environment:
       - INGESTION_URL=http://ingestion:8001
       - RAG_URL=http://rag:8004
+      # Enable /debug/config for Environment details UI (optional: set false in prod)
+      - DEBUG_ENDPOINTS=${DEBUG_ENDPOINTS:-true}
     depends_on:
       - ingestion
       - rag
