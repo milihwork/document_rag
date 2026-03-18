@@ -66,17 +66,18 @@ logger = logging.getLogger(__name__)
 _langchain_import_error: str | None = None
 if settings.LANGCHAIN_ENABLED:
     try:
+        from langchain_core.prompts import PromptTemplate  # noqa: F401
         from .langchain_adapters import (  # noqa: F401
             HttpVectorRetriever,
             RetrievalMapping,
             dedupe_documents,
         )
-        from langchain_core.prompts import PromptTemplate  # noqa: F401
     except (ImportError, ModuleNotFoundError) as e:
         _langchain_import_error = str(e)
         logger.error(
             "LangChain is enabled but imports failed: %s. "
-            "Install RAG dependencies (e.g. pip install -r backend/requirements.txt) or set LANGCHAIN_ENABLED=false.",
+            "Install RAG dependencies (e.g. pip install -r backend/requirements.txt) "
+            "or set LANGCHAIN_ENABLED=false.",
             _langchain_import_error,
             exc_info=True,
         )
