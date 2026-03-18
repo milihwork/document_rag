@@ -43,6 +43,7 @@
 * [19. Refactoring Path: LangChain, LlamaIndex, or Bedrock](#19-refactoring-path-langchain-llamaindex-or-bedrock)
 * [20. Conclusion](#20-conclusion)
 * [21. Demoing This Repo](#21-demoing-this-repo)
+* [22. Article updates](#22-article-updates)
 
 Most AI tutorials still follow the same recipe: call OpenAI, print the response, and label it an AI application.
 
@@ -935,3 +936,21 @@ Then:
 2. Upload a PDF
 3. Ask a question that requires document retrieval
 4. Show that the answer includes sources
+
+
+## 22. Article updates
+
+This section is at the end of the article so that:
+
+- **First-time readers** get the full narrative (sections 1–21) without interruption.
+- **Returning readers** can jump here to see what changed without re-reading the whole piece.
+- **Transparency:** you know the article was updated and when, so the timeline and the optional nature of new features are clear.
+
+**Article update (March 2025)**
+
+The repo now includes two additive changes that the main article does not yet describe in detail:
+
+- **LangChain (optional):** LangChain was added only inside the RAG service as an internal orchestration layer. The main practical benefit is optional **multi-query retrieval**: instead of searching with only one user phrasing, the service can generate several related search queries, retrieve a broader candidate set, deduplicate results, and then optionally rerank them. This can improve recall on short, vague, or synonym-heavy questions. It also enables optional **LangSmith tracing** for better debugging and observability. Importantly, the public architecture did not change: the Gateway, Embedding service, Retrieval service, and frontend still use the same contracts. See [LangChain + LangSmith (Optional)](https://github.com/milihwork/document_rag/blob/main/docs/langchain.md).
+- **Hugging Face:** The embedding layer is now explained more explicitly as using **Hugging Face sentence-transformers models** for local embeddings. If you were already using the same default model (`BAAI/bge-small-en-v1.5`), this is not a sudden retrieval-quality jump by itself. The main benefit is **clarity and flexibility**: the backend is easier to reason about, easier to document, and easier to swap to other Hugging Face models later (for example larger, smaller, or multilingual models) while keeping the same `POST /embed` service contract. See [Adding New Backends (Modular Architecture)](https://github.com/milihwork/document_rag/blob/main/docs/backends.md) and [Architecture](https://github.com/milihwork/document_rag/blob/main/docs/architecture.md).
+
+This note is here for transparency so readers can clearly see what was added after the original article was published. The core content above (sections 1-21) is unchanged, and the architecture and request flows described in the article remain accurate. These additions are optional enhancements rather than a rewrite of the system.
