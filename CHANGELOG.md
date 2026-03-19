@@ -4,6 +4,11 @@ All notable changes to this repository will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-03-19]
+
+### Fixed
+- RAG: fix short-query retrieval for 1–2 word questions (e.g. mili?). Expand short queries before retrieval, use expanded query for reranking, and re-expand after rewriter when it returns a very short string so retrieval always gets a full sentence.
+
 ## [2026-03-18]
 
 ### Added

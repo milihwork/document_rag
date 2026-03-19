@@ -2,6 +2,7 @@
 
 import logging
 import os
+import re
 import time
 
 import httpx
@@ -142,6 +143,43 @@ async def _search(query_vector: list[float], top_k: int | None = None) -> list[d
         return (r.json())[KEY_CHUNKS]
 
 
+def _expand_short_query(question: str, max_words: int = 2) -> str:
+    """
+    Expand very short questions (e.g. "mili?") into a full sentence for retrieval,
+    so embedding and multi-query get a meaningful query.
+    Example: "mili?" -> "Who is Mili? Information about Mili."
+    """
+    cleaned = re.sub(r"[.?!#]", "", question).strip()
+    words = [w for w in cleaned.split() if w]
+    if len(words) <= max_words and words:
+        term = " ".join(words).title()
+        expanded = f"Who is {term}? Information about {term}."
+        logger.info(
+            "Short query expanded for retrieval: %r -> %r",
+            question[:50],
+            expanded[:80],
+        )
+        return expanded
+    return question
+
+
+def _rerank_query(question: str, retrieval_query: str, max_words: int = 2) -> str:
+    """
+    For very short questions, return the rewritten retrieval_query so the reranker
+    sees a fuller query and does not demote relevant chunks. Otherwise return question.
+    """
+    cleaned = re.sub(r"[.?!#]", "", question).strip()
+    words = cleaned.split()
+    if len(words) <= max_words and retrieval_query and retrieval_query.strip():
+        logger.debug(
+            "Reranking with expanded query (short question): %r -> %r",
+            question[:50],
+            retrieval_query[:50],
+        )
+        return retrieval_query.strip()
+    return question
+
+
 def _rerank_chunks(question: str, chunks: list[dict], top_k: int | None = None) -> list[dict]:
     """Run reranker on chunk texts and return chunks in reranked order. Uses KEY_TEXT/KEY_SOURCE."""
     if not chunks:
@@ -245,7 +283,8 @@ async def _langchain_retrieve(question: str, retrieval_query: str) -> list[dict]
     if not reranker_enabled or not chunks:
         return chunks[: settings.RERANK_TOP_K]
 
-    return _rerank_chunks(question, chunks, settings.RERANK_TOP_K)
+    rerank_q = _rerank_query(question, retrieval_query)
+    return _rerank_chunks(rerank_q, chunks, settings.RERANK_TOP_K)
 
 
 async def _analyze_query(query: str) -> dict:
@@ -334,20 +373,28 @@ async def ask(request: AskRequest):
             except httpx.HTTPError as e:
                 logger.warning("ML service unavailable, continuing without: %s", e)
 
-        # Query rewriting for better retrieval
-        retrieval_query = request.question
+        # Short-query expansion: ensure retrieval gets a full sentence
+        # (e.g. "mili?" -> "Who is Mili? Information about Mili.")
+        retrieval_query = _expand_short_query(request.question)
+        # Query rewriting (rewriter gets retrieval_query so it can refine
+        # expanded short queries)
         if settings.QUERY_REWRITING_ENABLED:
             try:
-                retrieval_query = _get_query_rewriter().rewrite(request.question)
-                if retrieval_query != request.question:
-                    logger.info(
-                        "Query rewritten: original=%r, rewritten=%r",
-                        request.question[:80],
-                        retrieval_query[:80],
-                    )
+                rewritten = _get_query_rewriter().rewrite(retrieval_query)
+                if rewritten and rewritten.strip():
+                    if rewritten.strip() != retrieval_query:
+                        logger.info(
+                            "Query rewritten: original=%r, rewritten=%r",
+                            retrieval_query[:80],
+                            rewritten[:80],
+                        )
+                    retrieval_query = rewritten.strip()
             except Exception as e:
-                logger.warning("Query rewriting failed, using original: %s", e)
-                retrieval_query = request.question
+                logger.warning("Query rewriting failed, keeping current retrieval_query: %s", e)
+
+        # If rewriter returned a very short query (e.g. "mili"), expand again
+        # so retrieval gets a full sentence
+        retrieval_query = _expand_short_query(retrieval_query)
 
         if settings.LANGCHAIN_ENABLED:
             chunks = await _langchain_retrieve(request.question, retrieval_query)
@@ -359,7 +406,8 @@ async def ask(request: AskRequest):
                 chunks = await _search(
                     query_embedding, top_k=settings.VECTOR_SEARCH_TOP_K
                 )
-                chunks = _rerank_chunks(request.question, chunks, settings.RERANK_TOP_K)
+                rerank_q = _rerank_query(request.question, retrieval_query)
+                chunks = _rerank_chunks(rerank_q, chunks, settings.RERANK_TOP_K)
             else:
                 chunks = await _search(
                     query_embedding, top_k=settings.RERANK_TOP_K
